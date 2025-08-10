@@ -532,21 +532,24 @@ def get_entity_media(entity_type, entity_id):
     try:
         # Build query based on entity type
         if entity_type == 'mekan':
-            # Get UUID for the mekan (mekan_no can be integer or string)
+            # Get ALL UUIDs for this mekan (there might be duplicates)
             try:
                 cursor.execute("SELECT su_uuid FROM strat_unit WHERE mekan_no::text = %s", (str(entity_id),))
             except:
                 cursor.execute("SELECT su_uuid FROM strat_unit WHERE mekan_no = %s", (entity_id,))
-            result = cursor.fetchone()
-            if result:
-                query = """
-                    SELECT id, filename, original_filename, file_url, description, 
+            results = cursor.fetchall()
+            if results:
+                # Get media for ALL matching UUIDs
+                uuid_list = [r['su_uuid'] for r in results]
+                placeholders = ','.join(['%s'] * len(uuid_list))
+                query = f"""
+                    SELECT DISTINCT id, filename, original_filename, file_url, description, 
                            media_type, created_at, photographer, date_taken
                     FROM media 
-                    WHERE su_uuid = %s
+                    WHERE su_uuid IN ({placeholders})
                     ORDER BY created_at DESC
                 """
-                params = (result['su_uuid'],)
+                params = tuple(uuid_list)
             else:
                 return jsonify({'entity_type': entity_type, 'entity_id': entity_id, 'media': [], 'total': 0})
                 
