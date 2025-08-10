@@ -644,12 +644,16 @@ def get_entity_media(entity_type, entity_id):
         
         # Construct URLs for each media file
         for media in media_files:
-            # Use file_url if available, otherwise construct from filename
-            if media.get('file_url'):
+            # Build the correct Supabase storage URL
+            if media.get('filename'):
+                # The files are stored in the archaeological bucket on Supabase
+                # Format: https://[project-id].supabase.co/storage/v1/object/public/archaeological/[filename]
+                media['public_url'] = f"https://ctlqtgwyuknxpkssidcd.supabase.co/storage/v1/object/public/archaeological/{media['filename']}"
+            elif media.get('file_url'):
+                # Use file_url if available as fallback
                 media['public_url'] = media['file_url']
-            elif media.get('filename'):
-                # Try to construct Supabase storage URL
-                media['public_url'] = f"https://sbtpbadebhycqugsgglv.supabase.co/storage/v1/object/public/mekan-media/{media['filename']}"
+            else:
+                media['public_url'] = None
             
             # Add display name
             media['display_name'] = media.get('original_filename') or media.get('filename') or 'Unnamed file'

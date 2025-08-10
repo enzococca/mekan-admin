@@ -5,6 +5,7 @@ Web interface for managing users, roles, and permissions
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_cors import CORS
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import bcrypt
@@ -18,6 +19,16 @@ from api_archaeological_fixed import api_arch_fixed
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', secrets.token_hex(32))
+
+# Enable CORS for API routes
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["https://mekan-admin.onrender.com", "http://localhost:5001"],
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
 
 # Database configuration - Supabase
 DB_CONFIG = {
