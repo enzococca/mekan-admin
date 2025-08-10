@@ -87,11 +87,6 @@
             <i class="bi bi-gem"></i> Finds
         </button>
     </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="map-tab" data-bs-toggle="tab" data-bs-target="#map" type="button">
-            <i class="bi bi-map"></i> Map
-        </button>
-    </li>
 </ul>
 
 <div class="tab-content mt-3" id="mainTabsContent">
@@ -268,15 +263,6 @@
         <nav id="findsPagination"></nav>
     </div>
 
-    <!-- Map Tab -->
-    <div class="tab-pane fade" id="map" role="tabpanel">
-        <div id="mapContainer" style="height: 600px; background: #f0f0f0; border: 1px solid #ddd;">
-            <div class="text-center pt-5">
-                <i class="bi bi-map" style="font-size: 48px; color: #ccc;"></i>
-                <p class="text-muted">Map visualization will be loaded here</p>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Detail Modal -->
@@ -834,12 +820,18 @@ async function loadEntityMedia(entityType, entityId) {
                     <div class="col-md-4 mb-3">
                         <div class="card">
                             ${media.public_url ? 
-                                `<img src="${media.public_url}" class="card-img-top" alt="${media.display_name}" style="max-height: 200px; object-fit: cover;">` :
-                                `<div class="card-body text-center"><i class="bi bi-file-earmark" style="font-size: 48px;"></i></div>`
+                                `<img src="${media.public_url}" 
+                                      class="card-img-top" 
+                                      alt="${media.display_name}" 
+                                      style="max-height: 200px; object-fit: cover; cursor: pointer;"
+                                      onclick="window.open('${media.public_url}', '_blank')"
+                                      onerror="this.onerror=null; this.style.display='none'; this.parentElement.innerHTML+='<div class=\\'card-body text-center\\'><i class=\\'bi bi-image-alt\\' style=\\'font-size: 48px; color: #ccc;\\'></i><p class=\\'text-muted\\'>Image not found</p></div>';">` :
+                                `<div class="card-body text-center"><i class="bi bi-image" style="font-size: 48px; color: #ccc;"></i><p class="text-muted">No image URL</p></div>`
                             }
                             <div class="card-body">
                                 <p class="card-text">${media.description || media.display_name || 'No description'}</p>
                                 <small class="text-muted">${media.created_at ? new Date(media.created_at).toLocaleDateString() : ''}</small>
+                                ${media.public_url ? `<br><small class="text-muted" style="word-break: break-all;">URL: ${media.public_url}</small>` : ''}
                             </div>
                         </div>
                     </div>
