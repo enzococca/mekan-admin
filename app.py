@@ -14,6 +14,7 @@ import os
 from functools import wraps
 from api_routes_simple import api_bp
 from api_archaeological import api_arch
+from api_archaeological_fixed import api_arch_fixed
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', secrets.token_hex(32))
@@ -33,6 +34,7 @@ app.config.update(DB_CONFIG)
 # Register API blueprints
 app.register_blueprint(api_bp)
 app.register_blueprint(api_arch)
+app.register_blueprint(api_arch_fixed)
 
 # Flask-Login setup
 login_manager = LoginManager()
@@ -494,23 +496,11 @@ def api_stats():
         cursor.close()
         conn.close()
 
-@app.route('/data')
-@login_required
-def data_viewer():
-    """Archaeological data viewer page"""
-    return render_template('data_viewer_simple.html')
-
 @app.route('/archaeological')
-@login_required
-def archaeological_data():
-    """Complete archaeological data management page"""
-    return render_template('archaeological_data.html')
-
-@app.route('/archaeological-enhanced')
 @login_required
 def archaeological_enhanced():
     """Enhanced archaeological data management with relationships"""
-    return render_template('archaeological_enhanced.html')
+    return render_template('archaeological_enhanced_fixed.html')
 
 # Create initial admin user if none exists
 def create_initial_admin():
