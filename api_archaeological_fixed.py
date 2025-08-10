@@ -65,7 +65,7 @@ def get_mekan_units():
         params = []
         
         if search:
-            query += " AND (mekan_no ILIKE %s OR description ILIKE %s OR mekan_alan ILIKE %s)"
+            query += " AND (mekan_no::text ILIKE %s OR description ILIKE %s OR mekan_alan ILIKE %s)"
             params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
             
         # Count total

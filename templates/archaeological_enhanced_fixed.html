@@ -762,10 +762,10 @@ async function showDetail(entityType, entityId) {
     let apiEndpoint = '';
     switch(entityType) {
         case 'mekan':
-            apiEndpoint = `${API_BASE}/mekan?search=${entityId}`;  // Fixed to use 'mekan' endpoint
+            apiEndpoint = `${API_BASE}/mekan?search=${entityId}`;
             break;
         case 'birim':
-            apiEndpoint = `${API_BASE}/birin?search=${entityId}`;  // v2 uses 'birin' not 'birim'
+            apiEndpoint = `${API_BASE}/birim?search=${entityId}`;
             break;
         case 'wall':
             apiEndpoint = `${API_BASE}/walls?search=${entityId}`;
