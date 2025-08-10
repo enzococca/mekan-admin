@@ -7,7 +7,6 @@ This application is configured to deploy on Render's free tier. Follow these ste
 ### 1. Prerequisites
 - GitHub account
 - Render account (sign up at https://render.com)
-
 ### 2. Push Code to GitHub
 
 First, create a new GitHub repository and push your code:
