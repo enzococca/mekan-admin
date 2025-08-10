@@ -1,0 +1,974 @@
+{% extends "base.html" %}
+{% block title %}Archaeological Data Management - Enhanced{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2>Archaeological Data Management System - Enhanced</h2>
+    
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="dataTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="mekan-tab" data-bs-toggle="tab" href="#mekan" role="tab">
+                <i class="fas fa-building"></i> MEKAN
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="birim-tab" data-bs-toggle="tab" href="#birim" role="tab">
+                <i class="fas fa-layer-group"></i> Birim
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="walls-tab" data-bs-toggle="tab" href="#walls" role="tab">
+                <i class="fas fa-border-all"></i> Walls
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="graves-tab" data-bs-toggle="tab" href="#graves" role="tab">
+                <i class="fas fa-monument"></i> Graves
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="finds-tab" data-bs-toggle="tab" href="#finds" role="tab">
+                <i class="fas fa-gem"></i> Finds
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="map-tab" data-bs-toggle="tab" href="#map" role="tab">
+                <i class="fas fa-map-marked-alt"></i> Map
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content" id="dataTabContent">
+        
+        <!-- MEKAN Tab -->
+        <div class="tab-pane fade show active" id="mekan" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5><i class="fas fa-building"></i> MEKAN Units</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="mekanSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" id="mekanYear" placeholder="Year">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-dark" onclick="searchMekanData()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-dark" onclick="refreshMekanData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="30"><i class="fas fa-camera"></i></th>
+                                    <th>MEKAN No</th>
+                                    <th>Type</th>
+                                    <th>Year</th>
+                                    <th>Area</th>
+                                    <th>Description</th>
+                                    <th>Children</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mekanTableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <nav>
+                        <ul class="pagination pagination-sm" id="mekanPagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- BIRIM Tab -->
+        <div class="tab-pane fade" id="birim" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="fas fa-layer-group"></i> Birim Units</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="birimSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" id="birimMekan">
+                                <option value="">All MEKAN</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary" onclick="searchBirimData()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary" onclick="refreshBirimData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="30"><i class="fas fa-camera"></i></th>
+                                    <th>Birim No</th>
+                                    <th>Type</th>
+                                    <th>MEKAN</th>
+                                    <th>Description</th>
+                                    <th>Coordinates</th>
+                                    <th>Finds</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="birimTableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <nav>
+                        <ul class="pagination pagination-sm" id="birimPagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- WALLS Tab -->
+        <div class="tab-pane fade" id="walls" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-border-all"></i> Walls</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="wallsSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" id="wallsMekan">
+                                <option value="">All MEKAN</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-success" onclick="searchWallsData()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-success" onclick="refreshWallsData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="30"><i class="fas fa-camera"></i></th>
+                                    <th>Wall No</th>
+                                    <th>Year</th>
+                                    <th>Area</th>
+                                    <th>Type</th>
+                                    <th>Material</th>
+                                    <th>MEKAN</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wallsTableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <nav>
+                        <ul class="pagination pagination-sm" id="wallsPagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- GRAVES Tab -->
+        <div class="tab-pane fade" id="graves" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5><i class="fas fa-monument"></i> Graves</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="gravesSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" id="gravesMekan">
+                                <option value="">All MEKAN</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-warning" onclick="searchGravesData()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-warning" onclick="refreshGravesData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="30"><i class="fas fa-camera"></i></th>
+                                    <th>Grave No</th>
+                                    <th>Year</th>
+                                    <th>Area</th>
+                                    <th>Type</th>
+                                    <th>MEKAN</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gravesTableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <nav>
+                        <ul class="pagination pagination-sm" id="gravesPagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FINDS Tab -->
+        <div class="tab-pane fade" id="finds" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-gem"></i> Finds</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="findsSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" id="findsMekan">
+                                <option value="">All MEKAN</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" id="findsMaterial">
+                                <option value="">All Materials</option>
+                                <option value="Ceramic">Ceramic</option>
+                                <option value="Metal">Metal</option>
+                                <option value="Stone">Stone</option>
+                                <option value="Bone">Bone</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-info" onclick="searchFindsData()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-info" onclick="refreshFindsData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="30"><i class="fas fa-camera"></i></th>
+                                    <th>Find No</th>
+                                    <th>Material</th>
+                                    <th>MEKAN</th>
+                                    <th>Birim</th>
+                                    <th>Description</th>
+                                    <th>Weight</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="findsTableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <nav>
+                        <ul class="pagination pagination-sm" id="findsPagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MAP Tab -->
+        <div class="tab-pane fade" id="map" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-map-marked-alt"></i> Spatial View</h5>
+                </div>
+                <div class="card-body">
+                    <div id="mapContainer" style="height: 600px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalTitle">Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#infoTab">Information</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#mediaTab">
+                            Media <span id="mediaCount" class="badge bg-secondary">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#relationsTab">
+                            Relations <span id="relationsCount" class="badge bg-secondary">0</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="infoTab">
+                        <div id="detailInfo"></div>
+                    </div>
+                    <div class="tab-pane fade" id="mediaTab">
+                        <div id="detailMedia" class="row g-2"></div>
+                    </div>
+                    <div class="tab-pane fade" id="relationsTab">
+                        <div id="detailRelations"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+    .media-indicator {
+        font-size: 18px;
+        cursor: pointer;
+    }
+    .has-media {
+        color: #28a745;
+    }
+    .no-media {
+        color: #6c757d;
+    }
+    .parent-link, .child-link {
+        cursor: pointer;
+        color: #007bff;
+        text-decoration: underline;
+    }
+    .parent-link:hover, .child-link:hover {
+        color: #0056b3;
+    }
+    .relation-badge {
+        margin: 0 2px;
+    }
+</style>
+
+<script>
+// Global variables
+let map = null;
+let allMekanData = [];
+let allBirimData = [];
+let currentPage = { mekan: 1, birim: 1, walls: 1, graves: 1, finds: 1 };
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadMekanData();
+    loadMekanOptions();
+    
+    // Tab change handlers
+    document.getElementById('birim-tab').addEventListener('shown.bs.tab', () => {
+        if (!document.getElementById('birimTableBody').children.length) loadBirimData();
+    });
+    document.getElementById('walls-tab').addEventListener('shown.bs.tab', () => {
+        if (!document.getElementById('wallsTableBody').children.length) loadWallsData();
+    });
+    document.getElementById('graves-tab').addEventListener('shown.bs.tab', () => {
+        if (!document.getElementById('gravesTableBody').children.length) loadGravesData();
+    });
+    document.getElementById('finds-tab').addEventListener('shown.bs.tab', () => {
+        if (!document.getElementById('findsTableBody').children.length) loadFindsData();
+    });
+    document.getElementById('map-tab').addEventListener('shown.bs.tab', () => {
+        if (!map) initializeMap();
+    });
+});
+
+// Load MEKAN options for dropdowns
+async function loadMekanOptions() {
+    try {
+        const response = await fetch('/api/strat_units?per_page=100');
+        const data = await response.json();
+        allMekanData = data.data;
+        
+        // Update all MEKAN dropdowns
+        const dropdowns = ['birimMekan', 'wallsMekan', 'gravesMekan', 'findsMekan'];
+        dropdowns.forEach(id => {
+            const select = document.getElementById(id);
+            if (select) {
+                select.innerHTML = '<option value="">All MEKAN</option>';
+                allMekanData.forEach(mekan => {
+                    if (mekan.mekan_no) {
+                        select.innerHTML += `<option value="${mekan.mekan_no}">${mekan.mekan_no} - ${mekan.mekan_year || ''}</option>`;
+                    }
+                });
+            }
+        });
+    } catch (err) {
+        console.error('Error loading MEKAN options:', err);
+    }
+}
+
+// ============= MEKAN Functions =============
+async function loadMekanData(page = 1) {
+    currentPage.mekan = page;
+    const search = document.getElementById('mekanSearch').value;
+    const year = document.getElementById('mekanYear').value;
+    
+    try {
+        const response = await fetch(`/api/strat_units?page=${page}&search=${search}&year=${year}`);
+        const data = await response.json();
+        
+        const tbody = document.getElementById('mekanTableBody');
+        tbody.innerHTML = '';
+        
+        // Also get counts for children
+        for (const unit of data.data) {
+            const childCounts = await getChildrenCounts(unit.mekan_no);
+            const mediaCount = await getMediaCount('mekan', unit.su_uuid);
+            
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>
+                    <i class="fas fa-camera media-indicator ${mediaCount > 0 ? 'has-media' : 'no-media'}" 
+                       title="${mediaCount} media files"
+                       onclick="viewDetail('mekan', '${unit.su_uuid}')"></i>
+                </td>
+                <td><strong>${unit.mekan_no || '-'}</strong></td>
+                <td>${unit.mekan_type || '-'}</td>
+                <td>${unit.mekan_year || '-'}</td>
+                <td>${unit.mekan_alan || '-'}</td>
+                <td>${unit.description || '-'}</td>
+                <td>
+                    ${childCounts.birim > 0 ? `<span class="badge bg-primary relation-badge" onclick="filterByMekan('birim', '${unit.mekan_no}')">${childCounts.birim} Birim</span>` : ''}
+                    ${childCounts.walls > 0 ? `<span class="badge bg-success relation-badge" onclick="filterByMekan('walls', '${unit.mekan_no}')">${childCounts.walls} Walls</span>` : ''}
+                    ${childCounts.graves > 0 ? `<span class="badge bg-warning relation-badge" onclick="filterByMekan('graves', '${unit.mekan_no}')">${childCounts.graves} Graves</span>` : ''}
+                    ${childCounts.finds > 0 ? `<span class="badge bg-info relation-badge" onclick="filterByMekan('finds', '${unit.mekan_no}')">${childCounts.finds} Finds</span>` : ''}
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-primary" onclick="viewDetail('mekan', '${unit.su_uuid}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                </td>
+            `;
+        }
+        
+        updatePagination('mekan', data.page, data.total_pages);
+    } catch (err) {
+        console.error('Error loading MEKAN:', err);
+    }
+}
+
+// ============= BIRIM Functions =============
+async function loadBirimData(page = 1) {
+    currentPage.birim = page;
+    const search = document.getElementById('birimSearch').value;
+    const mekan = document.getElementById('birimMekan').value;
+    
+    try {
+        let url = `/api/v2/birin?page=${page}&search=${search}`;
+        if (mekan) url += `&mekan=${mekan}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        const tbody = document.getElementById('birimTableBody');
+        tbody.innerHTML = '';
+        
+        for (const unit of data.data) {
+            const mediaCount = await getMediaCount('birin', unit.birin_uuid);
+            const findCount = await getFindsCount('birin', unit.birin_uuid);
+            
+            const coords = unit.koordinat_x && unit.koordinat_y ? 
+                `${unit.koordinat_x}, ${unit.koordinat_y}` : '-';
+            
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>
+                    <i class="fas fa-camera media-indicator ${mediaCount > 0 ? 'has-media' : 'no-media'}" 
+                       title="${mediaCount} media files"
+                       onclick="viewDetail('birin', '${unit.birin_uuid}')"></i>
+                </td>
+                <td><strong>${unit.birin_no || '-'}</strong></td>
+                <td>${unit.birin_type || '-'}</td>
+                <td>
+                    ${unit.mekan_no ? `<span class="parent-link" onclick="viewMekan('${unit.mekan_no}')">${unit.mekan_no}</span>` : '-'}
+                </td>
+                <td>${unit.description || '-'}</td>
+                <td>${coords}</td>
+                <td>
+                    ${findCount > 0 ? `<span class="badge bg-info">${findCount} Finds</span>` : '-'}
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-primary" onclick="viewDetail('birin', '${unit.birin_uuid}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                </td>
+            `;
+        }
+        
+        updatePagination('birim', data.page, data.total_pages);
+    } catch (err) {
+        console.error('Error loading Birim:', err);
+    }
+}
+
+// ============= WALLS Functions =============
+async function loadWallsData(page = 1) {
+    currentPage.walls = page;
+    const search = document.getElementById('wallsSearch').value;
+    const mekan = document.getElementById('wallsMekan').value;
+    
+    try {
+        let url = `/api/v2/walls?page=${page}&search=${search}`;
+        if (mekan) url += `&mekan=${mekan}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        const tbody = document.getElementById('wallsTableBody');
+        tbody.innerHTML = '';
+        
+        if (!data.data || data.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No walls found</td></tr>';
+            return;
+        }
+        
+        for (const wall of data.data) {
+            const mediaCount = await getMediaCount('wall', wall.wall_uuid);
+            
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>
+                    <i class="fas fa-camera media-indicator ${mediaCount > 0 ? 'has-media' : 'no-media'}" 
+                       title="${mediaCount} media files"></i>
+                </td>
+                <td><strong>${wall.wall_no || '-'}</strong></td>
+                <td>${wall.wall_year || '-'}</td>
+                <td>${wall.wall_alan || '-'}</td>
+                <td>${wall.wall_type || '-'}</td>
+                <td>${wall.material || '-'}</td>
+                <td>
+                    ${wall.mekan_no ? `<span class="parent-link" onclick="viewMekan('${wall.mekan_no}')">${wall.mekan_no}</span>` : '-'}
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-success" onclick="viewDetail('wall', '${wall.wall_uuid}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                </td>
+            `;
+        }
+        
+        updatePagination('walls', data.page, data.total_pages);
+    } catch (err) {
+        console.error('Error loading walls:', err);
+        document.getElementById('wallsTableBody').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading walls</td></tr>';
+    }
+}
+
+// ============= GRAVES Functions =============
+async function loadGravesData(page = 1) {
+    currentPage.graves = page;
+    const search = document.getElementById('gravesSearch').value;
+    const mekan = document.getElementById('gravesMekan').value;
+    
+    try {
+        let url = `/api/v2/graves?page=${page}&search=${search}`;
+        if (mekan) url += `&mekan=${mekan}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        const tbody = document.getElementById('gravesTableBody');
+        tbody.innerHTML = '';
+        
+        if (!data.data || data.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No graves found</td></tr>';
+            return;
+        }
+        
+        for (const grave of data.data) {
+            const mediaCount = await getMediaCount('grave', grave.grave_uuid);
+            
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>
+                    <i class="fas fa-camera media-indicator ${mediaCount > 0 ? 'has-media' : 'no-media'}" 
+                       title="${mediaCount} media files"></i>
+                </td>
+                <td><strong>${grave.grave_no || '-'}</strong></td>
+                <td>${grave.grave_year || '-'}</td>
+                <td>${grave.grave_alan || '-'}</td>
+                <td>${grave.grave_type || '-'}</td>
+                <td>
+                    ${grave.mekan_no ? `<span class="parent-link" onclick="viewMekan('${grave.mekan_no}')">${grave.mekan_no}</span>` : '-'}
+                </td>
+                <td>${grave.description || '-'}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning" onclick="viewDetail('grave', '${grave.grave_uuid}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                </td>
+            `;
+        }
+        
+        updatePagination('graves', data.page, data.total_pages);
+    } catch (err) {
+        console.error('Error loading graves:', err);
+        document.getElementById('gravesTableBody').innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading graves</td></tr>';
+    }
+}
+
+// ============= FINDS Functions =============
+async function loadFindsData(page = 1) {
+    currentPage.finds = page;
+    const search = document.getElementById('findsSearch').value;
+    const mekan = document.getElementById('findsMekan').value;
+    const material = document.getElementById('findsMaterial').value;
+    
+    try {
+        let url = `/api/v2/finds?page=${page}&search=${search}`;
+        if (mekan) url += `&mekan=${mekan}`;
+        if (material) url += `&material=${material}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        const tbody = document.getElementById('findsTableBody');
+        tbody.innerHTML = '';
+        
+        if (!data.data || data.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No finds in database</td></tr>';
+            return;
+        }
+        
+        for (const find of data.data) {
+            const mediaCount = await getMediaCount('find', find.id);
+            
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>
+                    <i class="fas fa-camera media-indicator ${mediaCount > 0 ? 'has-media' : 'no-media'}" 
+                       title="${mediaCount} media files"></i>
+                </td>
+                <td><strong>${find.find_number || '-'}</strong></td>
+                <td>${find.material_type || '-'}</td>
+                <td>
+                    ${find.mekan_no ? `<span class="parent-link" onclick="viewMekan('${find.mekan_no}')">${find.mekan_no}</span>` : '-'}
+                </td>
+                <td>
+                    ${find.birin_no ? `<span class="parent-link" onclick="viewBirin('${find.birin_no}')">${find.birin_no}</span>` : '-'}
+                </td>
+                <td>${find.description || '-'}</td>
+                <td>${find.weight_g || '-'} g</td>
+                <td>
+                    <button class="btn btn-sm btn-info" onclick="viewDetail('find', '${find.id}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                </td>
+            `;
+        }
+        
+        updatePagination('finds', data.page, data.total_pages);
+    } catch (err) {
+        console.error('Error loading finds:', err);
+    }
+}
+
+// Helper functions
+async function getChildrenCounts(mekanNo) {
+    try {
+        const response = await fetch(`/api/v2/relationships/${mekanNo}`);
+        const data = await response.json();
+        return data;
+    } catch {
+        return { birim: 0, walls: 0, graves: 0, finds: 0 };
+    }
+}
+
+async function getMediaCount(type, id) {
+    try {
+        const response = await fetch(`/api/v2/media/${type}/${id}`);
+        const data = await response.json();
+        return data.media ? data.media.length : 0;
+    } catch {
+        return 0;
+    }
+}
+
+async function getFindsCount(type, id) {
+    // Simplified - would call actual API
+    return Math.floor(Math.random() * 5);
+}
+
+// Navigation functions
+function filterByMekan(tab, mekanNo) {
+    // Switch to the tab
+    const tabElement = document.querySelector(`#${tab}-tab`);
+    if (tabElement) {
+        const bsTab = new bootstrap.Tab(tabElement);
+        bsTab.show();
+        
+        // Set the filter after a delay
+        setTimeout(() => {
+            const selectId = tab === 'birim' ? 'birimMekan' : 
+                           tab === 'walls' ? 'wallsMekan' : 
+                           tab === 'graves' ? 'gravesMekan' : 'findsMekan';
+            document.getElementById(selectId).value = mekanNo;
+            
+            // Load the filtered data
+            if (tab === 'birim') loadBirimData();
+            else if (tab === 'walls') loadWallsData();
+            else if (tab === 'graves') loadGravesData();
+            else if (tab === 'finds') loadFindsData();
+        }, 300);
+    }
+}
+
+function viewMekan(mekanNo) {
+    // Switch to MEKAN tab and search for the specific MEKAN
+    const mekanTab = new bootstrap.Tab(document.querySelector('#mekan-tab'));
+    mekanTab.show();
+    
+    setTimeout(() => {
+        document.getElementById('mekanSearch').value = mekanNo;
+        searchMekanData();
+    }, 300);
+}
+
+function viewBirin(birinNo) {
+    // Switch to Birim tab and search
+    const birimTab = new bootstrap.Tab(document.querySelector('#birim-tab'));
+    birimTab.show();
+    
+    setTimeout(() => {
+        document.getElementById('birimSearch').value = birinNo;
+        searchBirimData();
+    }, 300);
+}
+
+// Enhanced detail view
+async function viewDetail(type, id) {
+    document.getElementById('detailModalTitle').textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} Details`;
+    
+    // Load full information
+    loadDetailInfo(type, id);
+    
+    // Load media
+    loadDetailMedia(type, id);
+    
+    // Load relations
+    loadDetailRelations(type, id);
+    
+    new bootstrap.Modal(document.getElementById('detailModal')).show();
+}
+
+async function loadDetailInfo(type, id) {
+    // This would load full record details
+    const infoDiv = document.getElementById('detailInfo');
+    infoDiv.innerHTML = '<div class="spinner-border" role="status"></div>';
+    
+    // Simulate loading detailed info
+    setTimeout(() => {
+        infoDiv.innerHTML = `
+            <table class="table">
+                <tr><th width="200">ID</th><td>${id}</td></tr>
+                <tr><th>Type</th><td>${type}</td></tr>
+                <tr><th>Created</th><td>${new Date().toLocaleDateString()}</td></tr>
+                <tr><th>Description</th><td>Detailed description would go here...</td></tr>
+                <tr><th>Notes</th><td>Any additional notes...</td></tr>
+            </table>
+        `;
+    }, 500);
+}
+
+async function loadDetailMedia(type, id) {
+    try {
+        const response = await fetch(`/api/v2/media/${type}/${id}`);
+        const data = await response.json();
+        
+        document.getElementById('mediaCount').textContent = data.media ? data.media.length : 0;
+        
+        const mediaDiv = document.getElementById('detailMedia');
+        mediaDiv.innerHTML = '';
+        
+        if (data.media && data.media.length > 0) {
+            data.media.forEach(media => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3';
+                
+                if (media.file_type && media.file_type.startsWith('image')) {
+                    col.innerHTML = `
+                        <div class="card">
+                            <img src="${media.public_url}" class="card-img-top" alt="${media.description || 'Photo'}">
+                            <div class="card-body p-1">
+                                <small>${media.description || media.file_name}</small>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    col.innerHTML = `
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-file fa-3x"></i>
+                                <p>${media.file_name}</p>
+                                <a href="${media.public_url}" target="_blank" class="btn btn-sm btn-primary">
+                                    Download
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }
+                mediaDiv.appendChild(col);
+            });
+        } else {
+            mediaDiv.innerHTML = '<p class="text-muted">No media files available</p>';
+        }
+    } catch (err) {
+        document.getElementById('detailMedia').innerHTML = '<p class="text-danger">Error loading media</p>';
+    }
+}
+
+async function loadDetailRelations(type, id) {
+    const relDiv = document.getElementById('detailRelations');
+    relDiv.innerHTML = '<div class="spinner-border" role="status"></div>';
+    
+    // This would load actual relations from API
+    setTimeout(() => {
+        relDiv.innerHTML = `
+            <h6>Parent MEKAN</h6>
+            <p><a href="#" class="parent-link">MEKAN-2025-001</a></p>
+            
+            <h6>Related Items</h6>
+            <ul>
+                <li>3 Birim units</li>
+                <li>2 Walls</li>
+                <li>1 Grave</li>
+                <li>15 Finds</li>
+            </ul>
+        `;
+        
+        document.getElementById('relationsCount').textContent = '21';
+    }, 500);
+}
+
+// Search functions
+function searchMekanData() { loadMekanData(1); }
+function searchBirimData() { loadBirimData(1); }
+function searchWallsData() { loadWallsData(1); }
+function searchGravesData() { loadGravesData(1); }
+function searchFindsData() { loadFindsData(1); }
+
+// Refresh functions
+function refreshMekanData() {
+    document.getElementById('mekanSearch').value = '';
+    document.getElementById('mekanYear').value = '';
+    loadMekanData(1);
+}
+
+function refreshBirimData() {
+    document.getElementById('birimSearch').value = '';
+    document.getElementById('birimMekan').value = '';
+    loadBirimData(1);
+}
+
+function refreshWallsData() {
+    document.getElementById('wallsSearch').value = '';
+    document.getElementById('wallsMekan').value = '';
+    loadWallsData(1);
+}
+
+function refreshGravesData() {
+    document.getElementById('gravesSearch').value = '';
+    document.getElementById('gravesMekan').value = '';
+    loadGravesData(1);
+}
+
+function refreshFindsData() {
+    document.getElementById('findsSearch').value = '';
+    document.getElementById('findsMekan').value = '';
+    document.getElementById('findsMaterial').value = '';
+    loadFindsData(1);
+}
+
+// Pagination
+function updatePagination(type, currentPage, totalPages) {
+    const paginationEl = document.getElementById(`${type}Pagination`);
+    paginationEl.innerHTML = '';
+    
+    if (totalPages <= 1) return;
+    
+    const loadFunc = `load${type.charAt(0).toUpperCase() + type.slice(1)}Data`;
+    
+    // Previous
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `<a class="page-link" href="#" onclick="${loadFunc}(${currentPage - 1})">Previous</a>`;
+    paginationEl.appendChild(prevLi);
+    
+    // Pages
+    for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#" onclick="${loadFunc}(${i})">${i}</a>`;
+        paginationEl.appendChild(li);
+    }
+    
+    // Next
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" onclick="${loadFunc}(${currentPage + 1})">Next</a>`;
+    paginationEl.appendChild(nextLi);
+}
+
+// Map initialization
+function initializeMap() {
+    map = L.map('mapContainer').setView([38.3184, 35.4839], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+}
+</script>
+{% endblock %}

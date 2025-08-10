@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Roles - MEKAN Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Role Management</h1>
+</div>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> Roles define what users can do in the system. Higher role levels have more permissions.
+</div>
+
+<!-- Roles Table -->
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Role</th>
+                <th>Level</th>
+                <th>Users</th>
+                <th>Description</th>
+                <th colspan="7" class="text-center">Permissions</th>
+            </tr>
+            <tr>
+                <th colspan="4"></th>
+                <th class="text-center">View</th>
+                <th class="text-center">Create</th>
+                <th class="text-center">Edit</th>
+                <th class="text-center">Delete</th>
+                <th class="text-center">Users</th>
+                <th class="text-center">Export</th>
+                <th class="text-center">Reports</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for role in roles %}
+            <tr>
+                <td>
+                    <strong>{{ role.role_name|title }}</strong>
+                </td>
+                <td>
+                    <span class="badge bg-secondary">{{ role.role_level }}</span>
+                </td>
+                <td>
+                    <span class="badge bg-primary">{{ role.user_count }}</span>
+                </td>
+                <td>{{ role.description }}</td>
+                <td class="text-center">
+                    {% if role.can_view %}
+                        <i class="bi bi-check-circle text-success"></i>
+                    {% else %}
+                        <i class="bi bi-x-circle text-danger"></i>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if role.can_create %}
+                        <i class="bi bi-check-circle text-success"></i>
+                    {% else %}
+                        <i class="bi bi-x-circle text-danger"></i>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if role.can_edit %}
+                        <i class="bi bi-check-circle text-success"></i>
+                    {% else %}
+                        <i class="bi bi-x-circle text-danger"></i>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if role.can_delete %}
+                        <i class="bi bi-check-circle text-success"></i>
+                    {% else %}
+                        <i class="bi bi-x-circle text-danger"></i>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if role.can_manage_users %}
+                        <i class="bi bi-check-circle text-success"></i>
+                    {% else %}
+                        <i class="bi bi-x-circle text-danger"></i>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if role.can_export %}
+                        <i class="bi bi-check-circle text-success"></i>
+                    {% else %}
+                        <i class="bi bi-x-circle text-danger"></i>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if role.can_generate_reports %}
+                        <i class="bi bi-check-circle text-success"></i>
+                    {% else %}
+                        <i class="bi bi-x-circle text-danger"></i>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Permission Legend -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Permission Descriptions</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li><strong>View:</strong> Can view and search archaeological data</li>
+                    <li><strong>Create:</strong> Can add new MEKANs, finds, and records</li>
+                    <li><strong>Edit:</strong> Can modify existing records</li>
+                    <li><strong>Delete:</strong> Can delete records (use with caution)</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li><strong>Manage Users:</strong> Can create users and invitation tokens</li>
+                    <li><strong>Export:</strong> Can export data to Excel, CSV, etc.</li>
+                    <li><strong>Generate Reports:</strong> Can create AI reports and analyses</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Role Hierarchy -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Role Hierarchy</h5>
+    </div>
+    <div class="card-body">
+        <div class="text-center">
+            <div class="d-inline-block text-start">
+                <div class="mb-2">
+                    <span class="badge bg-danger">Admin</span> 
+                    <i class="bi bi-arrow-right"></i> Full system access
+                </div>
+                <div class="mb-2 ms-3">
+                    <span class="badge bg-warning">Supervisor</span> 
+                    <i class="bi bi-arrow-right"></i> Can delete records
+                </div>
+                <div class="mb-2 ms-5">
+                    <span class="badge bg-primary">Editor</span> 
+                    <i class="bi bi-arrow-right"></i> Can edit records
+                </div>
+                <div class="mb-2 ms-5 ps-3">
+                    <span class="badge bg-success">Data Entry</span> 
+                    <i class="bi bi-arrow-right"></i> Can create records
+                </div>
+                <div class="ms-5 ps-5">
+                    <span class="badge bg-secondary">Viewer</span> 
+                    <i class="bi bi-arrow-right"></i> Read-only access
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

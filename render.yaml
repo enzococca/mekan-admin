@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: mekan-admin
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: POSTGRES_HOST
+        value: aws-0-eu-central-1.pooler.supabase.com
+      - key: POSTGRES_PORT
+        value: 5432
+      - key: POSTGRES_DATABASE
+        value: postgres
+      - key: POSTGRES_USER
+        value: postgres.ctlqtgwyuknxpkssidcd
+      - key: POSTGRES_PASSWORD
+        value: 6pRZELCQUoGFIcf

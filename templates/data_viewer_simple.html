@@ -1,0 +1,522 @@
+{% extends "base.html" %}
+{% block title %}Archaeological Data{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2>Archaeological Data Management - Supabase</h2>
+    
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="dataTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="strat-tab" data-bs-toggle="tab" href="#strat" role="tab">
+                <i class="fas fa-layer-group"></i> MEKAN Units
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="mekan-tab" data-bs-toggle="tab" href="#mekan" role="tab">
+                <i class="fas fa-building"></i> Birim
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="finds-tab" data-bs-toggle="tab" href="#finds" role="tab">
+                <i class="fas fa-gem"></i> Finds
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="stats-tab" data-bs-toggle="tab" href="#stats" role="tab">
+                <i class="fas fa-chart-bar"></i> Statistics
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content" id="dataTabContent">
+        <!-- MEKAN Units Tab -->
+        <div class="tab-pane fade show active" id="strat" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>MEKAN Units</h5>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-primary btn-sm" onclick="refreshStratData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Search -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="stratSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary" onclick="searchStratData()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Table -->
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Std Code</th>
+                                    <th>Site</th>
+                                    <th>Description</th>
+                                    <th>Year</th>
+                                    <th>MEKAN No</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stratTableBody">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <nav>
+                        <ul class="pagination pagination-sm" id="stratPagination">
+                            <!-- Pagination will be loaded here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Birim Tab -->
+        <div class="tab-pane fade" id="mekan" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>Birim Units</h5>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-primary btn-sm" onclick="refreshMekanData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Search -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="mekanSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary" onclick="searchMekanData()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Table -->
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Birin No</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Coordinates</th>
+                                    <th>Preservation</th>
+                                    <th>Excavated By</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mekanTableBody">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <nav>
+                        <ul class="pagination pagination-sm" id="mekanPagination">
+                            <!-- Pagination will be loaded here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Finds Tab -->
+        <div class="tab-pane fade" id="finds" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>Finds Catalog</h5>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-primary btn-sm" onclick="refreshFindsData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Search -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="findsSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary" onclick="searchFindsData()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Table -->
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Find ID</th>
+                                    <th>Catalog Number</th>
+                                    <th>Material</th>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                    <th>Weight (g)</th>
+                                    <th>Collected By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="findsTableBody">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <nav>
+                        <ul class="pagination pagination-sm" id="findsPagination">
+                            <!-- Pagination will be loaded here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Tab -->
+        <div class="tab-pane fade" id="stats" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Database Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Summary Cards -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total MEKAN</h5>
+                                    <h2 id="totalStrat">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Birim</h5>
+                                    <h2 id="totalBirim">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Finds</h5>
+                                    <h2 id="totalFinds">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Units by Year</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="unitsByYearChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Finds by Material</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="findsByMaterialChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variables
+let stratPage = 1;
+let mekanPage = 1;
+let findsPage = 1;
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadStratData();
+    loadStatistics();
+});
+
+// Stratigraphic Units Functions
+function loadStratData(page = 1) {
+    stratPage = page;
+    const search = document.getElementById('stratSearch').value;
+    
+    fetch(`/api/strat_units?page=${page}&search=${search}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            
+            const tbody = document.getElementById('stratTableBody');
+            tbody.innerHTML = '';
+            
+            data.data.forEach(unit => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${unit.code || '-'}</td>
+                    <td>${unit.std_code || '-'}</td>
+                    <td>${unit.site_id || '-'}</td>
+                    <td>${unit.description || '-'}</td>
+                    <td>${unit.mekan_year || '-'}</td>
+                    <td>${unit.mekan_no || '-'}</td>
+                    <td>${unit.mekan_type || '-'}</td>
+                `;
+            });
+            
+            updatePagination('strat', data.page, data.total_pages);
+        })
+        .catch(err => console.error('Error loading strat data:', err));
+}
+
+function searchStratData() {
+    loadStratData(1);
+}
+
+function refreshStratData() {
+    document.getElementById('stratSearch').value = '';
+    loadStratData(1);
+}
+
+// MEKAN Functions
+function loadMekanData(page = 1) {
+    mekanPage = page;
+    const search = document.getElementById('mekanSearch').value;
+    
+    fetch(`/api/mekan_units?page=${page}&search=${search}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            
+            const tbody = document.getElementById('mekanTableBody');
+            tbody.innerHTML = '';
+            
+            data.data.forEach(unit => {
+                const row = tbody.insertRow();
+                const coords = unit.koordinat_x && unit.koordinat_y ? 
+                    `${unit.koordinat_x}, ${unit.koordinat_y}` : '-';
+                row.innerHTML = `
+                    <td>${unit.birin_no || '-'}</td>
+                    <td>${unit.birin_type || '-'}</td>
+                    <td>${unit.description || '-'}</td>
+                    <td>${coords}</td>
+                    <td>${unit.preservation_state || '-'}</td>
+                    <td>${unit.excavated_by || '-'}</td>
+                    <td>${unit.excavation_date || '-'}</td>
+                `;
+            });
+            
+            updatePagination('mekan', data.page, data.total_pages);
+        })
+        .catch(err => console.error('Error loading mekan data:', err));
+}
+
+function searchMekanData() {
+    loadMekanData(1);
+}
+
+function refreshMekanData() {
+    document.getElementById('mekanSearch').value = '';
+    loadMekanData(1);
+}
+
+// Finds Functions
+function loadFindsData(page = 1) {
+    findsPage = page;
+    const search = document.getElementById('findsSearch').value;
+    
+    fetch(`/api/finds?page=${page}&search=${search}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            
+            const tbody = document.getElementById('findsTableBody');
+            tbody.innerHTML = '';
+            
+            data.data.forEach(find => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${find.find_id || '-'}</td>
+                    <td>${find.catalog_number || '-'}</td>
+                    <td>${find.material || '-'}</td>
+                    <td>${find.description || '-'}</td>
+                    <td>${find.quantity || '-'}</td>
+                    <td>${find.weight_g || '-'}</td>
+                    <td>${find.collected_by || '-'}</td>
+                `;
+            });
+            
+            updatePagination('finds', data.page, data.total_pages);
+        })
+        .catch(err => console.error('Error loading finds data:', err));
+}
+
+function searchFindsData() {
+    loadFindsData(1);
+}
+
+function refreshFindsData() {
+    document.getElementById('findsSearch').value = '';
+    loadFindsData(1);
+}
+
+// Tab change handlers
+document.getElementById('mekan-tab').addEventListener('shown.bs.tab', function() {
+    if (document.getElementById('mekanTableBody').children.length === 0) {
+        loadMekanData();
+    }
+});
+
+document.getElementById('finds-tab').addEventListener('shown.bs.tab', function() {
+    if (document.getElementById('findsTableBody').children.length === 0) {
+        loadFindsData();
+    }
+});
+
+// Pagination
+function updatePagination(type, currentPage, totalPages) {
+    const paginationEl = document.getElementById(`${type}Pagination`);
+    paginationEl.innerHTML = '';
+    
+    if (totalPages <= 1) return;
+    
+    // Previous button
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+    const loadFunc = type === 'strat' ? 'loadStratData' : 
+                     type === 'mekan' ? 'loadMekanData' : 'loadFindsData';
+    prevLi.innerHTML = `<a class="page-link" href="#" onclick="${loadFunc}(${currentPage - 1})">Previous</a>`;
+    paginationEl.appendChild(prevLi);
+    
+    // Page numbers
+    for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#" onclick="${loadFunc}(${i})">${i}</a>`;
+        paginationEl.appendChild(li);
+    }
+    
+    // Next button
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" onclick="${loadFunc}(${currentPage + 1})">Next</a>`;
+    paginationEl.appendChild(nextLi);
+}
+
+// Statistics
+function loadStatistics() {
+    fetch('/api/statistics')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            
+            // Update summary cards
+            document.getElementById('totalStrat').textContent = data.total_strat_units || 0;
+            document.getElementById('totalBirim').textContent = data.total_mekan || 0;
+            document.getElementById('totalFinds').textContent = data.total_finds || 0;
+            
+            // Units by Year Chart
+            if (data.units_by_year && data.units_by_year.length > 0) {
+                new Chart(document.getElementById('unitsByYearChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: data.units_by_year.map(i => i.year),
+                        datasets: [{
+                            label: 'Units',
+                            data: data.units_by_year.map(i => i.count),
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Finds by Material Chart
+            if (data.finds_by_material && data.finds_by_material.length > 0) {
+                new Chart(document.getElementById('findsByMaterialChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: data.finds_by_material.map(i => i.material),
+                        datasets: [{
+                            data: data.finds_by_material.map(i => i.count),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.5)',
+                                'rgba(54, 162, 235, 0.5)',
+                                'rgba(255, 206, 86, 0.5)',
+                                'rgba(75, 192, 192, 0.5)',
+                                'rgba(153, 102, 255, 0.5)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            }
+        })
+        .catch(err => console.error('Error loading statistics:', err));
+}
+</script>
+{% endblock %}

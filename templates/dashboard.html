@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MEKAN Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card border-primary">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Active Users</h5>
+                        <span class="h2 font-weight-bold mb-0">{{ stats.active_users }}</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-primary text-white rounded-circle shadow">
+                            <i class="bi bi-people fs-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card border-success">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Active Tokens</h5>
+                        <span class="h2 font-weight-bold mb-0">{{ stats.active_tokens }}</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-success text-white rounded-circle shadow">
+                            <i class="bi bi-key fs-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card border-info">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Total Roles</h5>
+                        <span class="h2 font-weight-bold mb-0">{{ stats.users_by_role|length }}</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-info text-white rounded-circle shadow">
+                            <i class="bi bi-shield fs-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Users by Role Chart -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Users by Role</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="roleChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">User Distribution</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Users</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set total_users = stats.users_by_role|sum(attribute='count') %}
+                        {% for role in stats.users_by_role %}
+                        <tr>
+                            <td>{{ role.role_name|title }}</td>
+                            <td>{{ role.count }}</td>
+                            <td>
+                                {% if total_users > 0 %}
+                                    {{ "%.1f"|format((role.count / total_users * 100)) }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in recent_activity %}
+                            <tr>
+                                <td>{{ activity.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ activity.full_name }}</td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ activity.action }}</span>
+                                </td>
+                                <td>
+                                    {% if activity.table_name %}
+                                        {{ activity.table_name }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Role distribution chart
+const ctx = document.getElementById('roleChart').getContext('2d');
+const roleData = {{ stats.users_by_role|tojson }};
+
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: roleData.map(r => r.role_name),
+        datasets: [{
+            data: roleData.map(r => r.count),
+            backgroundColor: [
+                '#007bff',
+                '#28a745',
+                '#ffc107',
+                '#dc3545',
+                '#6c757d'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            }
+        }
+    }
+});
+
+// Auto-refresh every 30 seconds
+setTimeout(() => location.reload(), 30000);
+</script>
+{% endblock %}

@@ -1,0 +1,923 @@
+{% extends "base.html" %}
+{% block title %}Archaeological Data Viewer{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2>Archaeological Data Management</h2>
+    
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="dataTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="us-tab" data-bs-toggle="tab" href="#us" role="tab">
+                <i class="fas fa-layer-group"></i> Stratigraphic Units
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="mekan-tab" data-bs-toggle="tab" href="#mekan" role="tab">
+                <i class="fas fa-building"></i> MEKAN/CAN Units
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="finds-tab" data-bs-toggle="tab" href="#finds" role="tab">
+                <i class="fas fa-gem"></i> Finds Catalog
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="map-tab" data-bs-toggle="tab" href="#map" role="tab">
+                <i class="fas fa-map-marked-alt"></i> Map View
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="stats-tab" data-bs-toggle="tab" href="#stats" role="tab">
+                <i class="fas fa-chart-bar"></i> Statistics
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content" id="dataTabContent">
+        <!-- Stratigraphic Units Tab -->
+        <div class="tab-pane fade show active" id="us" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>Stratigraphic Units</h5>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-success btn-sm" onclick="exportData('us')">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="refreshUSData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filters -->
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" id="usSite" placeholder="Site">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" id="usArea" placeholder="Area">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control form-control-sm" id="usYear" placeholder="Year">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" id="usSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary btn-sm" onclick="filterUSData()">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="clearUSFilters()">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Table -->
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover" id="usTable">
+                            <thead>
+                                <tr>
+                                    <th>US Number</th>
+                                    <th>Site</th>
+                                    <th>Area</th>
+                                    <th>Year</th>
+                                    <th>Definition</th>
+                                    <th>Interpretation</th>
+                                    <th>Period</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usTableBody">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <nav>
+                        <ul class="pagination pagination-sm" id="usPagination">
+                            <!-- Pagination will be loaded here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MEKAN Tab -->
+        <div class="tab-pane fade" id="mekan" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>MEKAN/CAN Units</h5>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-success btn-sm" onclick="exportData('mekan')">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="refreshMekanData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filters -->
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" id="mekanSite" placeholder="Site">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" id="mekanArea" placeholder="Area">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control form-control-sm" id="mekanYear" placeholder="Year">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control form-control-sm" id="mekanSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary btn-sm" onclick="filterMekanData()">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="clearMekanFilters()">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Table -->
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover" id="mekanTable">
+                            <thead>
+                                <tr>
+                                    <th>MEKAN No</th>
+                                    <th>CAN No</th>
+                                    <th>Site</th>
+                                    <th>Area</th>
+                                    <th>Year</th>
+                                    <th>Definition</th>
+                                    <th>Period</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mekanTableBody">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <nav>
+                        <ul class="pagination pagination-sm" id="mekanPagination">
+                            <!-- Pagination will be loaded here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Finds Tab -->
+        <div class="tab-pane fade" id="finds" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>Finds Catalog</h5>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-success btn-sm" onclick="exportData('finds')">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="refreshFindsData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filters -->
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" id="findsSite" placeholder="Site">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" id="findsArea" placeholder="Area">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control form-control-sm" id="findsYear" placeholder="Year">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control form-control-sm" id="findsCategory">
+                                <option value="">All Categories</option>
+                                <option value="Pottery">Pottery</option>
+                                <option value="Metal">Metal</option>
+                                <option value="Stone">Stone</option>
+                                <option value="Bone">Bone</option>
+                                <option value="Glass">Glass</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class="form-control form-control-sm" id="findsSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary btn-sm" onclick="filterFindsData()">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="clearFindsFilters()">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Table -->
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover" id="findsTable">
+                            <thead>
+                                <tr>
+                                    <th>Find Number</th>
+                                    <th>Site</th>
+                                    <th>Area</th>
+                                    <th>US/MEKAN</th>
+                                    <th>Year</th>
+                                    <th>Category</th>
+                                    <th>Material</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="findsTableBody">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <nav>
+                        <ul class="pagination pagination-sm" id="findsPagination">
+                            <!-- Pagination will be loaded here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Map Tab -->
+        <div class="tab-pane fade" id="map" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Map View</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="showUS" checked>
+                                <label class="form-check-label" for="showUS">
+                                    Show Stratigraphic Units
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="showMekan" checked>
+                                <label class="form-check-label" for="showMekan">
+                                    Show MEKAN Units
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="showFinds" checked>
+                                <label class="form-check-label" for="showFinds">
+                                    Show Finds
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary btn-sm" onclick="refreshMap()">
+                                <i class="fas fa-sync"></i> Refresh Map
+                            </button>
+                        </div>
+                    </div>
+                    <div id="mapContainer" style="height: 600px; background: #f0f0f0; border-radius: 5px;">
+                        <!-- Map will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Tab -->
+        <div class="tab-pane fade" id="stats" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Archaeological Data Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Summary Cards -->
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total US</h5>
+                                    <h2 id="totalUS">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total MEKAN</h5>
+                                    <h2 id="totalMekan">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Finds</h5>
+                                    <h2 id="totalFinds">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Campaign Years</h5>
+                                    <h2 id="totalYears">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Units by Year</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="unitsByYearChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Finds by Category</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="findsByCategoryChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Units by Period</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="unitsByPeriodChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalTitle">Record Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailModalBody">
+                <!-- Details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="exportPDF()">
+                    <i class="fas fa-file-pdf"></i> Export PDF
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script>
+// Global variables
+let map = null;
+let currentDetailType = null;
+let currentDetailId = null;
+let usPage = 1;
+let mekanPage = 1;
+let findsPage = 1;
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadUSData();
+    loadStatistics();
+    
+    // Initialize map when tab is shown
+    document.getElementById('map-tab').addEventListener('shown.bs.tab', function() {
+        if (!map) {
+            initializeMap();
+        }
+    });
+});
+
+// US Data Functions
+function loadUSData(page = 1) {
+    usPage = page;
+    const params = new URLSearchParams({
+        page: page,
+        site: document.getElementById('usSite').value,
+        area: document.getElementById('usArea').value,
+        year: document.getElementById('usYear').value,
+        search: document.getElementById('usSearch').value
+    });
+    
+    fetch(`/api/stratigraphic_units?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('usTableBody');
+            tbody.innerHTML = '';
+            
+            data.data.forEach(unit => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${unit.us_number}</td>
+                    <td>${unit.site || '-'}</td>
+                    <td>${unit.area || '-'}</td>
+                    <td>${unit.year || '-'}</td>
+                    <td>${unit.definition || '-'}</td>
+                    <td>${unit.interpretation || '-'}</td>
+                    <td>${unit.period || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="viewDetail('us', ${unit.id_us})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+            });
+            
+            updatePagination('us', data.page, data.total_pages);
+        });
+}
+
+function filterUSData() {
+    loadUSData(1);
+}
+
+function clearUSFilters() {
+    document.getElementById('usSite').value = '';
+    document.getElementById('usArea').value = '';
+    document.getElementById('usYear').value = '';
+    document.getElementById('usSearch').value = '';
+    loadUSData(1);
+}
+
+function refreshUSData() {
+    loadUSData(usPage);
+}
+
+// MEKAN Data Functions
+function loadMekanData(page = 1) {
+    mekanPage = page;
+    const params = new URLSearchParams({
+        page: page,
+        site: document.getElementById('mekanSite').value,
+        area: document.getElementById('mekanArea').value,
+        year: document.getElementById('mekanYear').value,
+        search: document.getElementById('mekanSearch').value
+    });
+    
+    fetch(`/api/mekan_units?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('mekanTableBody');
+            tbody.innerHTML = '';
+            
+            data.data.forEach(unit => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${unit.mekan_no || '-'}</td>
+                    <td>${unit.can_no || '-'}</td>
+                    <td>${unit.site || '-'}</td>
+                    <td>${unit.area || '-'}</td>
+                    <td>${unit.year || '-'}</td>
+                    <td>${unit.definition || '-'}</td>
+                    <td>${unit.period || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="viewDetail('mekan', ${unit.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+            });
+            
+            updatePagination('mekan', data.page, data.total_pages);
+        });
+}
+
+function filterMekanData() {
+    loadMekanData(1);
+}
+
+function clearMekanFilters() {
+    document.getElementById('mekanSite').value = '';
+    document.getElementById('mekanArea').value = '';
+    document.getElementById('mekanYear').value = '';
+    document.getElementById('mekanSearch').value = '';
+    loadMekanData(1);
+}
+
+function refreshMekanData() {
+    loadMekanData(mekanPage);
+}
+
+// Finds Data Functions
+function loadFindsData(page = 1) {
+    findsPage = page;
+    const params = new URLSearchParams({
+        page: page,
+        site: document.getElementById('findsSite').value,
+        area: document.getElementById('findsArea').value,
+        year: document.getElementById('findsYear').value,
+        category: document.getElementById('findsCategory').value,
+        search: document.getElementById('findsSearch').value
+    });
+    
+    fetch(`/api/finds?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('findsTableBody');
+            tbody.innerHTML = '';
+            
+            data.data.forEach(find => {
+                const row = tbody.insertRow();
+                const context = find.us_number ? `US ${find.us_number}` : `MEKAN ${find.mekan_no}`;
+                row.innerHTML = `
+                    <td>${find.find_number}</td>
+                    <td>${find.site || '-'}</td>
+                    <td>${find.area || '-'}</td>
+                    <td>${context}</td>
+                    <td>${find.year || '-'}</td>
+                    <td>${find.category || '-'}</td>
+                    <td>${find.material || '-'}</td>
+                    <td>${find.description || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="viewDetail('find', ${find.find_id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+            });
+            
+            updatePagination('finds', data.page, data.total_pages);
+        });
+}
+
+function filterFindsData() {
+    loadFindsData(1);
+}
+
+function clearFindsFilters() {
+    document.getElementById('findsSite').value = '';
+    document.getElementById('findsArea').value = '';
+    document.getElementById('findsYear').value = '';
+    document.getElementById('findsCategory').value = '';
+    document.getElementById('findsSearch').value = '';
+    loadFindsData(1);
+}
+
+function refreshFindsData() {
+    loadFindsData(findsPage);
+}
+
+// Tab change handlers
+document.getElementById('mekan-tab').addEventListener('shown.bs.tab', function() {
+    if (document.getElementById('mekanTableBody').children.length === 0) {
+        loadMekanData();
+    }
+});
+
+document.getElementById('finds-tab').addEventListener('shown.bs.tab', function() {
+    if (document.getElementById('findsTableBody').children.length === 0) {
+        loadFindsData();
+    }
+});
+
+// Pagination
+function updatePagination(type, currentPage, totalPages) {
+    const paginationEl = document.getElementById(`${type}Pagination`);
+    paginationEl.innerHTML = '';
+    
+    if (totalPages <= 1) return;
+    
+    // Previous button
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `<a class="page-link" href="#" onclick="load${type.charAt(0).toUpperCase() + type.slice(1)}Data(${currentPage - 1})">Previous</a>`;
+    paginationEl.appendChild(prevLi);
+    
+    // Page numbers
+    for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#" onclick="load${type.charAt(0).toUpperCase() + type.slice(1).replace('us', 'US')}Data(${i})">${i}</a>`;
+        paginationEl.appendChild(li);
+    }
+    
+    // Next button
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" onclick="load${type.charAt(0).toUpperCase() + type.slice(1)}Data(${currentPage + 1})">Next</a>`;
+    paginationEl.appendChild(nextLi);
+}
+
+// View detail
+function viewDetail(type, id) {
+    currentDetailType = type;
+    currentDetailId = id;
+    
+    let endpoint = '';
+    if (type === 'us') endpoint = '/api/stratigraphic_units';
+    else if (type === 'mekan') endpoint = '/api/mekan_units';
+    else if (type === 'find') endpoint = '/api/finds';
+    
+    fetch(`${endpoint}?id=${id}`)
+        .then(response => response.json())
+        .then(data => {
+            const record = data.data[0];
+            document.getElementById('detailModalTitle').textContent = 
+                type === 'us' ? `US ${record.us_number}` :
+                type === 'mekan' ? `MEKAN ${record.mekan_no}` :
+                `Find ${record.find_number}`;
+            
+            let html = '<table class="table table-sm">';
+            for (const [key, value] of Object.entries(record)) {
+                if (key !== 'geometry' && value !== null) {
+                    const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    html += `<tr><th>${label}</th><td>${value}</td></tr>`;
+                }
+            }
+            html += '</table>';
+            
+            document.getElementById('detailModalBody').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('detailModal')).show();
+        });
+}
+
+// Export functions
+function exportData(type) {
+    let filters = {};
+    
+    if (type === 'us') {
+        filters = {
+            site: document.getElementById('usSite').value,
+            area: document.getElementById('usArea').value,
+            year: document.getElementById('usYear').value
+        };
+    } else if (type === 'mekan') {
+        filters = {
+            site: document.getElementById('mekanSite').value,
+            area: document.getElementById('mekanArea').value,
+            year: document.getElementById('mekanYear').value
+        };
+    } else if (type === 'finds') {
+        filters = {
+            site: document.getElementById('findsSite').value,
+            area: document.getElementById('findsArea').value,
+            year: document.getElementById('findsYear').value,
+            category: document.getElementById('findsCategory').value
+        };
+    }
+    
+    fetch('/api/export/excel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            type: type,
+            filters: filters
+        })
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${type}_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    });
+}
+
+function exportPDF() {
+    if (!currentDetailType || !currentDetailId) return;
+    
+    fetch('/api/export/pdf', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            type: currentDetailType,
+            id: currentDetailId
+        })
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentDetailType}_${currentDetailId}_${new Date().toISOString().split('T')[0]}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    });
+}
+
+// Map functions
+function initializeMap() {
+    map = L.map('mapContainer').setView([38.5, 35.5], 7);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    loadMapData();
+}
+
+function loadMapData() {
+    const types = [];
+    if (document.getElementById('showUS').checked) types.push('us');
+    if (document.getElementById('showMekan').checked) types.push('mekan');
+    if (document.getElementById('showFinds').checked) types.push('finds');
+    
+    types.forEach(type => {
+        fetch(`/api/spatial/features?type=${type}`)
+            .then(response => response.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: function(feature) {
+                        const colors = {
+                            'us': '#3388ff',
+                            'mekan': '#33ff88',
+                            'find': '#ff3388'
+                        };
+                        return {
+                            color: colors[feature.properties.layer],
+                            weight: 2,
+                            opacity: 0.8,
+                            fillOpacity: 0.3
+                        };
+                    },
+                    onEachFeature: function(feature, layer) {
+                        layer.bindPopup(`
+                            <b>${feature.properties.label}</b><br>
+                            Site: ${feature.properties.site}<br>
+                            Area: ${feature.properties.area}<br>
+                            Year: ${feature.properties.year}
+                        `);
+                    }
+                }).addTo(map);
+            });
+    });
+}
+
+function refreshMap() {
+    if (map) {
+        map.eachLayer(layer => {
+            if (layer instanceof L.GeoJSON) {
+                map.removeLayer(layer);
+            }
+        });
+        loadMapData();
+    }
+}
+
+// Statistics
+function loadStatistics() {
+    fetch('/api/statistics')
+        .then(response => response.json())
+        .then(data => {
+            // Update summary cards
+            document.getElementById('totalUS').textContent = data.total_us;
+            document.getElementById('totalMekan').textContent = data.total_mekan;
+            document.getElementById('totalFinds').textContent = data.total_finds;
+            document.getElementById('totalYears').textContent = data.total_years;
+            
+            // Units by Year Chart
+            const yearLabels = [];
+            const usData = [];
+            const mekanData = [];
+            
+            data.us_by_year.forEach(item => {
+                if (!yearLabels.includes(item.year)) yearLabels.push(item.year);
+            });
+            data.mekan_by_year.forEach(item => {
+                if (!yearLabels.includes(item.year)) yearLabels.push(item.year);
+            });
+            yearLabels.sort();
+            
+            yearLabels.forEach(year => {
+                const usItem = data.us_by_year.find(i => i.year === year);
+                const mekanItem = data.mekan_by_year.find(i => i.year === year);
+                usData.push(usItem ? usItem.count : 0);
+                mekanData.push(mekanItem ? mekanItem.count : 0);
+            });
+            
+            new Chart(document.getElementById('unitsByYearChart'), {
+                type: 'bar',
+                data: {
+                    labels: yearLabels,
+                    datasets: [{
+                        label: 'Stratigraphic Units',
+                        data: usData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)'
+                    }, {
+                        label: 'MEKAN Units',
+                        data: mekanData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Finds by Category Chart
+            new Chart(document.getElementById('findsByCategoryChart'), {
+                type: 'pie',
+                data: {
+                    labels: data.finds_by_category.map(i => i.category),
+                    datasets: [{
+                        data: data.finds_by_category.map(i => i.count),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(255, 206, 86, 0.5)',
+                            'rgba(75, 192, 192, 0.5)',
+                            'rgba(153, 102, 255, 0.5)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+            
+            // Units by Period Chart
+            new Chart(document.getElementById('unitsByPeriodChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.us_by_period.map(i => i.period),
+                    datasets: [{
+                        label: 'Units',
+                        data: data.us_by_period.map(i => i.count),
+                        backgroundColor: 'rgba(153, 102, 255, 0.5)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+}
+</script>
+{% endblock %}

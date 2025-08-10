@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5001:5001"
+    environment:
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5433
+      - DB_NAME=hybrid_strat
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - SECRET_KEY=your-secret-key-here-change-in-production
+    volumes:
+      - ./templates:/app/templates
+      - ./static:/app/static
+    restart: unless-stopped
+    networks:
+      - mekan-network
+
+networks:
+  mekan-network:
+    driver: bridge
