@@ -644,14 +644,21 @@ def get_entity_media(entity_type, entity_id):
         
         # Construct URLs for each media file
         for media in media_files:
-            # Build the correct Supabase storage URL
-            if media.get('filename'):
-                # The files are stored in the archaeological bucket on Supabase
-                # Format: https://[project-id].supabase.co/storage/v1/object/public/archaeological/[filename]
-                media['public_url'] = f"https://ctlqtgwyuknxpkssidcd.supabase.co/storage/v1/object/public/archaeological/{media['filename']}"
-            elif media.get('file_url'):
-                # Use file_url if available as fallback
+            # Use the file_url from database if available (it has the complete path)
+            if media.get('file_url'):
                 media['public_url'] = media['file_url']
+            elif media.get('filename'):
+                # Fallback: construct URL from filename
+                # The files are stored in the mekan-media bucket on Supabase
+                # Try to guess the path structure based on entity type
+                if entity_type == 'mekan':
+                    # Format: mekan/YYYY/filename
+                    media['public_url'] = f"https://ctlqtgwyuknxpkssidcd.supabase.co/storage/v1/object/public/mekan-media/mekan/2025/{media['filename']}"
+                elif entity_type == 'grave':
+                    media['public_url'] = f"https://ctlqtgwyuknxpkssidcd.supabase.co/storage/v1/object/public/mekan-media/grave/2025/{media['filename']}"
+                else:
+                    # Generic path
+                    media['public_url'] = f"https://ctlqtgwyuknxpkssidcd.supabase.co/storage/v1/object/public/mekan-media/{media['filename']}"
             else:
                 media['public_url'] = None
             
