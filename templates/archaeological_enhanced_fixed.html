@@ -762,7 +762,7 @@ async function showDetail(entityType, entityId) {
     let apiEndpoint = '';
     switch(entityType) {
         case 'mekan':
-            apiEndpoint = `${API_BASE}/units?search=${entityId}`;  // v2 uses 'units' endpoint for MEKAN
+            apiEndpoint = `${API_BASE}/mekan?search=${entityId}`;  // Fixed to use 'mekan' endpoint
             break;
         case 'birim':
             apiEndpoint = `${API_BASE}/birin?search=${entityId}`;  // v2 uses 'birin' not 'birim'
@@ -834,12 +834,12 @@ async function loadEntityMedia(entityType, entityId) {
                     <div class="col-md-4 mb-3">
                         <div class="card">
                             ${media.public_url ? 
-                                `<img src="${media.public_url}" class="card-img-top" alt="${media.file_name}">` :
+                                `<img src="${media.public_url}" class="card-img-top" alt="${media.display_name}" style="max-height: 200px; object-fit: cover;">` :
                                 `<div class="card-body text-center"><i class="bi bi-file-earmark" style="font-size: 48px;"></i></div>`
                             }
                             <div class="card-body">
-                                <p class="card-text">${media.description || media.file_name}</p>
-                                <small class="text-muted">${media.created_at}</small>
+                                <p class="card-text">${media.description || media.display_name || 'No description'}</p>
+                                <small class="text-muted">${media.created_at ? new Date(media.created_at).toLocaleDateString() : ''}</small>
                             </div>
                         </div>
                     </div>

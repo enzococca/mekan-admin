@@ -523,36 +523,133 @@ def get_entity_media(entity_type, entity_id):
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     
     try:
-        query = """
-            SELECT 
-                id,
-                entity_type,
-                entity_id,
-                file_name,
-                file_path,
-                file_url,
-                file_type,
-                description,
-                created_at
-            FROM media
-            WHERE entity_type = %s AND entity_id = %s
-            ORDER BY created_at DESC
-        """
-        
-        cursor.execute(query, (entity_type, entity_id))
+        # Build query based on entity type
+        if entity_type == 'mekan':
+            # Get UUID for the mekan (mekan_no can be integer or string)
+            try:
+                cursor.execute("SELECT su_uuid FROM strat_unit WHERE mekan_no::text = %s", (str(entity_id),))
+            except:
+                cursor.execute("SELECT su_uuid FROM strat_unit WHERE mekan_no = %s", (entity_id,))
+            result = cursor.fetchone()
+            if result:
+                query = """
+                    SELECT id, filename, original_filename, file_url, description, 
+                           media_type, created_at, photographer, date_taken
+                    FROM media 
+                    WHERE su_uuid = %s
+                    ORDER BY created_at DESC
+                """
+                params = (result['su_uuid'],)
+            else:
+                return jsonify({'entity_type': entity_type, 'entity_id': entity_id, 'media': [], 'total': 0})
+                
+        elif entity_type == 'birim':
+            # Get UUID for the birim
+            cursor.execute("SELECT birin_uuid FROM mekan_birin WHERE birin_no::text = %s", (entity_id,))
+            result = cursor.fetchone()
+            if result:
+                query = """
+                    SELECT id, filename, original_filename, file_url, description,
+                           media_type, created_at, photographer, date_taken
+                    FROM media 
+                    WHERE birin_uuid = %s
+                    ORDER BY created_at DESC
+                """
+                params = (result['birin_uuid'],)
+            else:
+                return jsonify({'entity_type': entity_type, 'entity_id': entity_id, 'media': [], 'total': 0})
+                
+        elif entity_type == 'wall':
+            # Get UUID for the wall
+            cursor.execute("SELECT wall_uuid FROM mekan_wall WHERE wall_no = %s", (entity_id,))
+            result = cursor.fetchone()
+            if result:
+                query = """
+                    SELECT id, filename, original_filename, file_url, description,
+                           media_type, created_at, photographer, date_taken
+                    FROM media 
+                    WHERE wall_uuid = %s
+                    ORDER BY created_at DESC
+                """
+                params = (result['wall_uuid'],)
+            else:
+                return jsonify({'entity_type': entity_type, 'entity_id': entity_id, 'media': [], 'total': 0})
+                
+        elif entity_type == 'grave':
+            # Get UUID for the grave
+            cursor.execute("SELECT grave_uuid FROM mekan_grave WHERE grave_no::text = %s", (entity_id,))
+            result = cursor.fetchone()
+            if result:
+                query = """
+                    SELECT id, filename, original_filename, file_url, description,
+                           media_type, created_at, photographer, date_taken
+                    FROM media 
+                    WHERE grave_uuid = %s
+                    ORDER BY created_at DESC
+                """
+                params = (result['grave_uuid'],)
+            else:
+                return jsonify({'entity_type': entity_type, 'entity_id': entity_id, 'media': [], 'total': 0})
+                
+        elif entity_type == 'find':
+            # Check if using mekan_buluntu or finds table
+            cursor.execute("""
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_name = 'mekan_buluntu'
+                )
+            """)
+            if cursor.fetchone()['exists']:
+                # Get UUID for the buluntu
+                cursor.execute("SELECT su_uuid, birin_uuid FROM mekan_buluntu WHERE bul_no::text = %s", (entity_id,))
+                result = cursor.fetchone()
+                if result:
+                    query = """
+                        SELECT id, filename, original_filename, file_url, description,
+                               media_type, created_at, photographer, date_taken
+                        FROM media 
+                        WHERE su_uuid = %s OR birin_uuid = %s
+                        ORDER BY created_at DESC
+                    """
+                    params = (result['su_uuid'], result['birin_uuid'])
+                else:
+                    return jsonify({'entity_type': entity_type, 'entity_id': entity_id, 'media': [], 'total': 0})
+            else:
+                # Use finds table
+                cursor.execute("SELECT find_id FROM finds WHERE find_number::text = %s", (entity_id,))
+                result = cursor.fetchone()
+                if result:
+                    query = """
+                        SELECT id, filename, original_filename, file_url, description,
+                               media_type, created_at, photographer, date_taken
+                        FROM media 
+                        WHERE find_id = %s
+                        ORDER BY created_at DESC
+                    """
+                    params = (result['find_id'],)
+                else:
+                    return jsonify({'entity_type': entity_type, 'entity_id': entity_id, 'media': [], 'total': 0})
+        else:
+            return jsonify({'error': 'Invalid entity type'}), 400
+            
+        cursor.execute(query, params)
         media_files = cursor.fetchall()
         
-        # Construct URLs
+        # Construct URLs for each media file
         for media in media_files:
-            if media.get('file_path'):
-                # Supabase storage URL
-                media['public_url'] = f"https://sbtpbadebhycqugsgglv.supabase.co/storage/v1/object/public/{media['file_path']}"
-            elif media.get('file_url'):
+            # Use file_url if available, otherwise construct from filename
+            if media.get('file_url'):
                 media['public_url'] = media['file_url']
+            elif media.get('filename'):
+                # Try to construct Supabase storage URL
+                media['public_url'] = f"https://sbtpbadebhycqugsgglv.supabase.co/storage/v1/object/public/mekan-media/{media['filename']}"
+            
+            # Add display name
+            media['display_name'] = media.get('original_filename') or media.get('filename') or 'Unnamed file'
         
         return jsonify({
             'entity_type': entity_type,
-            'entity_id': entity_id,
+            'entity_id': entity_id,  
             'media': media_files,
             'total': len(media_files)
         })
