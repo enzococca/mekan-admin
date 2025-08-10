@@ -74,12 +74,17 @@ def get_mekan_units():
         cursor.execute(count_query, params)
         total = cursor.fetchone()['count']
         
-        # Add pagination
-        query += " ORDER BY mekan_year DESC, mekan_no LIMIT %s OFFSET %s"
+        # Add pagination and order
+        query += " ORDER BY mekan_year DESC NULLS LAST, mekan_no NULLS LAST LIMIT %s OFFSET %s"
         params.extend([per_page, (page - 1) * per_page])
         
         cursor.execute(query, params)
         units = cursor.fetchall()
+        
+        # Log for debugging
+        print(f"MEKAN Query executed: {query}")
+        print(f"Params: {params}")
+        print(f"Found {len(units)} MEKAN units")
         
         # Convert geometry and check for media
         for unit in units:
@@ -746,6 +751,46 @@ def export_to_pdf(entity_type, entity_id):
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# ============= TEST ENDPOINT =============
+@api_arch_fixed.route('/test', methods=['GET'])
+@login_required
+def test_data():
+    """Test endpoint to verify data access"""
+    conn = get_db()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    
+    try:
+        test_results = {}
+        
+        # Test MEKAN query
+        cursor.execute("SELECT COUNT(*) as count FROM strat_unit")
+        test_results['mekan_count'] = cursor.fetchone()['count']
+        
+        cursor.execute("SELECT mekan_no, mekan_year, mekan_alan FROM strat_unit LIMIT 5")
+        test_results['mekan_sample'] = cursor.fetchall()
+        
+        # Test Walls query
+        cursor.execute("SELECT COUNT(*) as count FROM mekan_wall")
+        test_results['wall_count'] = cursor.fetchone()['count']
+        
+        cursor.execute("SELECT wall_no, wall_year, wall_alan FROM mekan_wall LIMIT 5")
+        test_results['wall_sample'] = cursor.fetchall()
+        
+        # Test Graves query
+        cursor.execute("SELECT COUNT(*) as count FROM mekan_grave")
+        test_results['grave_count'] = cursor.fetchone()['count']
+        
+        cursor.execute("SELECT grave_no, grave_year, grave_alan FROM mekan_grave LIMIT 5")
+        test_results['grave_sample'] = cursor.fetchall()
+        
+        return jsonify(test_results)
+        
+    except Exception as e:
+        return jsonify({'error': str(e), 'traceback': str(e.__traceback__)}), 500
     finally:
         cursor.close()
         conn.close()
