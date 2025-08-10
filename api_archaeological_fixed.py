@@ -49,17 +49,16 @@ def get_mekan_units():
                 mekan_year,
                 mekan_alan,
                 mekan_acma,
-                mekan_locus,
-                mekan_level,
-                mekan_kod,
-                us_number,
+                mekan_type,
+                mekan_plankare,
+                mekan_tabaka,
                 description,
                 description_tr,
-                koordinat_x,
-                koordinat_y,
-                koordinat_z,
+                mekan_koordinat_x as koordinat_x,
+                mekan_koordinat_y as koordinat_y,
+                mekan_koordinat_z as koordinat_z,
                 created_at,
-                ST_AsGeoJSON(geometry) as geometry
+                ST_AsGeoJSON(geom) as geometry
             FROM strat_unit
             WHERE 1=1
         """
@@ -94,8 +93,8 @@ def get_mekan_units():
             # Check if has media
             cursor.execute("""
                 SELECT COUNT(*) as count FROM media 
-                WHERE entity_type = 'mekan' AND entity_id = %s::text
-            """, (unit['mekan_no'],))
+                WHERE su_uuid = %s
+            """, (unit['su_uuid'],))
             unit['has_media'] = cursor.fetchone()['count'] > 0
         
         return jsonify({
@@ -172,8 +171,8 @@ def get_birim_units():
             # Check for media
             cursor.execute("""
                 SELECT COUNT(*) as count FROM media 
-                WHERE entity_type = 'birim' AND entity_id = %s::text
-            """, (unit['birin_no'],))
+                WHERE birin_uuid = %s
+            """, (unit['birin_uuid'],))
             unit['has_media'] = cursor.fetchone()['count'] > 0
         
         return jsonify({
@@ -206,7 +205,7 @@ def get_walls():
         query = """
             SELECT 
                 w.*,
-                ST_AsGeoJSON(w.geometry) as geometry
+                ST_AsGeoJSON(w.geom) as geometry
             FROM mekan_wall w
             WHERE 1=1
         """
@@ -247,8 +246,8 @@ def get_walls():
             # Check for media
             cursor.execute("""
                 SELECT COUNT(*) as count FROM media 
-                WHERE entity_type = 'wall' AND entity_id = %s
-            """, (wall['wall_no'],))
+                WHERE wall_uuid = %s
+            """, (wall['wall_uuid'],))
             wall['has_media'] = cursor.fetchone()['count'] > 0
         
         return jsonify({
@@ -282,7 +281,7 @@ def get_graves():
             SELECT 
                 g.*,
                 s.mekan_no,
-                ST_AsGeoJSON(g.geometry) as geometry
+                ST_AsGeoJSON(g.geom) as geometry
             FROM mekan_grave g
             LEFT JOIN strat_unit s ON g.su_uuid = s.su_uuid
             WHERE 1=1
@@ -313,8 +312,8 @@ def get_graves():
             # Check for media
             cursor.execute("""
                 SELECT COUNT(*) as count FROM media 
-                WHERE entity_type = 'grave' AND entity_id = %s::text
-            """, (grave['grave_no'],))
+                WHERE grave_uuid = %s
+            """, (grave.get('grave_uuid'),))
             grave['has_media'] = cursor.fetchone()['count'] > 0
         
         return jsonify({
@@ -360,12 +359,12 @@ def get_finds():
                     s.mekan_no,
                     s.mekan_year,
                     s.mekan_alan,
-                    ST_AsGeoJSON(b.geometry) as geometry
+                    ST_AsGeoJSON(b.geom) as geometry
                 FROM mekan_buluntu b
                 LEFT JOIN strat_unit s ON b.su_uuid = s.su_uuid
                 WHERE 1=1
             """
-            id_field = 'buluntu_no'
+            id_field = 'bul_no'
         else:
             query = """
                 SELECT 
@@ -383,7 +382,10 @@ def get_finds():
         params = []
         
         if search:
-            query += f" AND (description ILIKE %s OR material_type ILIKE %s)"
+            if use_buluntu:
+                query += f" AND (b.aciklama ILIKE %s OR b.malzemesi ILIKE %s)"
+            else:
+                query += f" AND (f.description ILIKE %s OR f.material_type ILIKE %s)"
             params.extend([f'%{search}%', f'%{search}%'])
             
         # Count total
@@ -404,11 +406,16 @@ def get_finds():
                 find['geometry'] = json.loads(find['geometry'])
             
             # Check for media
-            find_id = find.get(id_field) or find.get('id')
-            cursor.execute("""
-                SELECT COUNT(*) as count FROM media 
-                WHERE entity_type IN ('find', 'buluntu') AND entity_id = %s::text
-            """, (find_id,))
+            if use_buluntu:
+                cursor.execute("""
+                    SELECT COUNT(*) as count FROM media 
+                    WHERE su_uuid = %s OR birin_uuid = %s
+                """, (find.get('su_uuid'), find.get('birin_uuid')))
+            else:
+                cursor.execute("""
+                    SELECT COUNT(*) as count FROM media 
+                    WHERE find_id = %s
+                """, (find.get('find_id'),))
             find['has_media'] = cursor.fetchone()['count'] > 0
         
         return jsonify({
