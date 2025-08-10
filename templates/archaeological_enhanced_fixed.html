@@ -349,8 +349,8 @@
 </style>
 
 <script>
-// API Base URL - using v3 for fixed API
-const API_BASE = '/api/v3';
+// API Base URL - using v2 for now until v3 is deployed
+const API_BASE = '/api/v2';
 
 // Current page tracking
 let currentPages = {
@@ -420,7 +420,7 @@ async function loadMekanData(page = 1) {
     });
     
     try {
-        const response = await fetch(`${API_BASE}/mekan?${params}`);
+        const response = await fetch(`${API_BASE}/units?${params}`);  // v2 uses 'units' for MEKAN
         const data = await response.json();
         
         const tbody = document.getElementById('mekanTableBody');
@@ -493,7 +493,7 @@ async function loadBirimData(page = 1) {
     });
     
     try {
-        const response = await fetch(`${API_BASE}/birim?${params}`);
+        const response = await fetch(`${API_BASE}/birin?${params}`);  // v2 uses 'birin' not 'birim'
         const data = await response.json();
         
         const tbody = document.getElementById('birimTableBody');
@@ -762,10 +762,10 @@ async function showDetail(entityType, entityId) {
     let apiEndpoint = '';
     switch(entityType) {
         case 'mekan':
-            apiEndpoint = `${API_BASE}/mekan?search=${entityId}`;
+            apiEndpoint = `${API_BASE}/units?search=${entityId}`;  // v2 uses 'units' endpoint for MEKAN
             break;
         case 'birim':
-            apiEndpoint = `${API_BASE}/birim?search=${entityId}`;
+            apiEndpoint = `${API_BASE}/birin?search=${entityId}`;  // v2 uses 'birin' not 'birim'
             break;
         case 'wall':
             apiEndpoint = `${API_BASE}/walls?search=${entityId}`;
