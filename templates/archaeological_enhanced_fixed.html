@@ -675,7 +675,7 @@ async function loadFindsData(page = 1) {
             data.data.forEach(item => {
                 const row = document.createElement('tr');
                 row.className = 'clickable-row';
-                const findNo = item.buluntu_no || item.find_number || item.id;
+                const findNo = item.bul_no || item.buluntu_no || item.find_number || item.id;
                 row.innerHTML = `
                     <td>
                         <span class="media-indicator ${item.has_media ? 'has-media' : 'no-media'}">
@@ -683,10 +683,10 @@ async function loadFindsData(page = 1) {
                         </span>
                     </td>
                     <td><strong>${findNo || ''}</strong></td>
-                    <td>${item.material_type || ''}</td>
-                    <td>${item.quantity || ''}</td>
-                    <td>${item.weight_g || ''}</td>
-                    <td>${item.description || ''}</td>
+                    <td>${item.malzemesi || item.material_type || ''}</td>
+                    <td>${item.sayisi || item.quantity || ''}</td>
+                    <td>${item.agirlik || item.weight_g || ''}</td>
+                    <td>${item.aciklama || item.description || ''}</td>
                     <td>${item.mekan_no ? `<a href="#" onclick="showDetail('mekan', '${item.mekan_no}')">${item.mekan_no}</a>` : '-'}</td>
                     <td>
                         <button class="btn btn-sm btn-primary" onclick="showDetail('find', '${findNo}')">

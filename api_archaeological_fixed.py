@@ -65,8 +65,15 @@ def get_mekan_units():
         params = []
         
         if search:
-            query += " AND (mekan_no::text ILIKE %s OR description ILIKE %s OR mekan_alan ILIKE %s)"
-            params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
+            # Try exact match first for numeric searches
+            try:
+                search_int = int(search)
+                query += " AND (mekan_no = %s OR description ILIKE %s OR mekan_alan ILIKE %s)"
+                params.extend([search_int, f'%{search}%', f'%{search}%'])
+            except ValueError:
+                # Not a number, use ILIKE for all fields
+                query += " AND (mekan_no::text ILIKE %s OR description ILIKE %s OR mekan_alan ILIKE %s)"
+                params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
             
         # Count total
         count_query = f"SELECT COUNT(*) FROM ({query}) as t"
