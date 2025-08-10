@@ -3,6 +3,7 @@
 {% block title %}Archaeological Data - MEKAN Admin{% endblock %}
 
 {% block content %}
+<!-- Version: 2.0.1 - Fixed relationships and removed map -->
 <div class="pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Archaeological Data Management</h1>
     <p class="text-muted">Complete system with parent-child relationships and media management</p>
@@ -413,10 +414,7 @@ async function loadMekanData(page = 1) {
         tbody.innerHTML = '';
         
         if (data.data && data.data.length > 0) {
-            for (const item of data.data) {
-                // Get relationship counts
-                const relations = await getRelationships(item.mekan_no);
-                
+            data.data.forEach(item => {
                 const row = document.createElement('tr');
                 row.className = 'clickable-row';
                 row.innerHTML = `
@@ -436,24 +434,21 @@ async function loadMekanData(page = 1) {
                     </td>
                     <td>${item.description || ''}</td>
                     <td>
-                        <small>
-                            ${relations.birim > 0 ? `<span class="badge bg-success">${relations.birim} Birim</span> ` : ''}
-                            ${relations.walls > 0 ? `<span class="badge bg-warning">${relations.walls} Walls</span> ` : ''}
-                            ${relations.graves > 0 ? `<span class="badge bg-danger">${relations.graves} Graves</span> ` : ''}
-                            ${relations.finds > 0 ? `<span class="badge bg-info">${relations.finds} Finds</span>` : ''}
-                        </small>
+                        <button class="btn btn-sm btn-info" onclick="event.stopPropagation(); showDetail('mekan', '${item.mekan_no}')">
+                            <i class="bi bi-diagram-3"></i> View Relations
+                        </button>
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="showDetail('mekan', '${item.mekan_no}')">
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); showDetail('mekan', '${item.mekan_no}')">
                             <i class="bi bi-eye"></i>
                         </button>
-                        <button class="btn btn-sm btn-success" onclick="exportPdf('mekan', '${item.mekan_no}')">
+                        <button class="btn btn-sm btn-success" onclick="event.stopPropagation(); exportPdf('mekan', '${item.mekan_no}')">
                             <i class="bi bi-file-earmark-pdf"></i>
                         </button>
                     </td>
                 `;
                 tbody.appendChild(row);
-            }
+            })
         } else {
             tbody.innerHTML = '<tr><td colspan="9" class="text-center">No MEKAN units found</td></tr>';
         }
@@ -696,14 +691,19 @@ async function loadFindsData(page = 1) {
     }
 }
 
-// Get relationship counts
+// Get relationship counts - only call when needed
 async function getRelationships(mekanNo) {
     try {
-        const response = await fetch(`${API_BASE}/relationships/${mekanNo}`);
+        const response = await fetch(`${API_BASE}/relationships/${mekanNo}`, {
+            signal: AbortSignal.timeout(5000) // 5 second timeout
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error('Error getting relationships:', error);
+        console.error('Error getting relationships for', mekanNo, ':', error);
         return { birim: 0, walls: 0, graves: 0, finds: 0 };
     }
 }
@@ -850,21 +850,29 @@ async function loadEntityMedia(entityType, entityId) {
 
 // Load MEKAN relations
 async function loadMekanRelations(mekanNo) {
+    const container = document.getElementById('detailRelationsContent');
+    container.innerHTML = '<p class="text-muted">Loading relationships...</p>';
+    
     try {
         const relations = await getRelationships(mekanNo);
         
-        let html = '<h5>Related Items</h5><ul>';
-        if (relations.birim > 0) html += `<li>${relations.birim} Birim units</li>`;
-        if (relations.walls > 0) html += `<li>${relations.walls} Walls</li>`;
-        if (relations.graves > 0) html += `<li>${relations.graves} Graves</li>`;
-        if (relations.finds > 0) html += `<li>${relations.finds} Finds</li>`;
-        html += '</ul>';
+        let html = '<h5>Related Items</h5>';
+        if (relations.birim === 0 && relations.walls === 0 && relations.graves === 0 && relations.finds === 0) {
+            html += '<p class="text-muted">No related items found</p>';
+        } else {
+            html += '<ul class="list-group">';
+            if (relations.birim > 0) html += `<li class="list-group-item"><span class="badge bg-success">${relations.birim}</span> Birim units</li>`;
+            if (relations.walls > 0) html += `<li class="list-group-item"><span class="badge bg-warning">${relations.walls}</span> Walls</li>`;
+            if (relations.graves > 0) html += `<li class="list-group-item"><span class="badge bg-danger">${relations.graves}</span> Graves</li>`;
+            if (relations.finds > 0) html += `<li class="list-group-item"><span class="badge bg-info">${relations.finds}</span> Finds</li>`;
+            html += '</ul>';
+        }
         
-        document.getElementById('detailRelationsContent').innerHTML = html;
+        container.innerHTML = html;
         
     } catch (error) {
         console.error('Error loading relations:', error);
-        document.getElementById('detailRelationsContent').innerHTML = '<p class="text-danger">Error loading relations</p>';
+        container.innerHTML = '<p class="text-danger">Unable to load relationships</p>';
     }
 }
 
