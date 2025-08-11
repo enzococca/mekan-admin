@@ -39,23 +39,57 @@
         .navbar {
             box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .05);
         }
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                padding: 0;
+            }
+            
+            main {
+                padding-top: 60px !important;
+            }
+            
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+        }
+        
+        /* Touch-friendly sizing */
+        @media (hover: none) and (pointer: coarse) {
+            .nav-link {
+                padding: 0.75rem 1rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-dark bg-dark fixed-top">
+    <!-- Navbar with mobile toggle -->
+    <nav class="navbar navbar-dark bg-dark fixed-top navbar-expand-md">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="bi bi-building"></i> MEKAN Admin
             </a>
             {% if current_user.is_authenticated %}
-            <div class="d-flex align-items-center text-white">
+            <!-- Mobile menu toggle -->
+            <button class="navbar-toggler d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- Desktop user info -->
+            <div class="d-none d-md-flex align-items-center text-white">
                 <span class="me-3">
                     <i class="bi bi-person-circle"></i> 
                     {{ current_user.full_name }} ({{ current_user.role_name }})
                 </span>
                 <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">
                     <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+            <!-- Mobile user info -->
+            <div class="d-md-none">
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-box-arrow-right"></i>
                 </a>
             </div>
             {% endif %}
@@ -65,8 +99,8 @@
     {% if current_user.is_authenticated %}
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <!-- Desktop Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-none d-md-block bg-light sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -123,8 +157,70 @@
                 </div>
             </nav>
 
+            <!-- Mobile Sidebar (Offcanvas) -->
+            <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="sidebarMenu">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title">Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" 
+                               href="{{ url_for('index') }}">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        
+                        {% if current_user.permissions.can_manage_users %}
+                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>User Management</span>
+                        </h6>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'users' %}active{% endif %}" 
+                               href="{{ url_for('users') }}">
+                                <i class="bi bi-people"></i> Users
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'tokens' %}active{% endif %}" 
+                               href="{{ url_for('tokens') }}">
+                                <i class="bi bi-key"></i> Invitation Tokens
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'roles' %}active{% endif %}" 
+                               href="{{ url_for('roles') }}">
+                                <i class="bi bi-shield"></i> Roles
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>Archaeological Data</span>
+                        </h6>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'archaeological_enhanced' %}active{% endif %}" 
+                               href="{{ url_for('archaeological_enhanced') }}">
+                                <i class="bi bi-diagram-3"></i> Archaeological Data
+                            </a>
+                        </li>
+                        
+                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>Monitoring</span>
+                        </h6>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'activity' %}active{% endif %}" 
+                               href="{{ url_for('activity') }}">
+                                <i class="bi bi-clock-history"></i> Activity Log
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
             <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <main class="col-12 col-md-9 ms-md-auto col-lg-10 px-3 px-md-4">
                 <!-- Flash messages -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}

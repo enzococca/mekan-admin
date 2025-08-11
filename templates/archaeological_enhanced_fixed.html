@@ -3,92 +3,94 @@
 {% block title %}Archaeological Data - MEKAN Admin{% endblock %}
 
 {% block content %}
-<!-- Version: 2.0.1 - Fixed relationships and removed map -->
+<!-- Version: 2.1.0 - Mobile responsive -->
 <div class="pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Archaeological Data Management</h1>
-    <p class="text-muted">Complete system with parent-child relationships and media management</p>
+    <h1 class="h2 fs-4 fs-md-2">Archaeological Data Management</h1>
+    <p class="text-muted d-none d-md-block">Complete system with parent-child relationships and media management</p>
 </div>
 
-<!-- Statistics Cards -->
-<div class="row mb-4">
-    <div class="col-md-2">
-        <div class="card text-white bg-primary">
-            <div class="card-body">
-                <h5 class="card-title">MEKAN</h5>
-                <p class="card-text display-6" id="stat-mekan">0</p>
+<!-- Statistics Cards - Responsive Grid -->
+<div class="row mb-4 g-2">
+    <div class="col-6 col-sm-4 col-md-2">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body p-2 p-md-3">
+                <h6 class="card-title fs-7 fs-md-5 mb-1">MEKAN</h6>
+                <p class="card-text fs-3 fs-md-1 mb-0" id="stat-mekan">0</p>
             </div>
         </div>
     </div>
-    <div class="col-md-2">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h5 class="card-title">Birim</h5>
-                <p class="card-text display-6" id="stat-birim">0</p>
+    <div class="col-6 col-sm-4 col-md-2">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body p-2 p-md-3">
+                <h6 class="card-title fs-7 fs-md-5 mb-1">Birim</h6>
+                <p class="card-text fs-3 fs-md-1 mb-0" id="stat-birim">0</p>
             </div>
         </div>
     </div>
-    <div class="col-md-2">
-        <div class="card text-white bg-warning">
-            <div class="card-body">
-                <h5 class="card-title">Walls</h5>
-                <p class="card-text display-6" id="stat-walls">0</p>
+    <div class="col-6 col-sm-4 col-md-2">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body p-2 p-md-3">
+                <h6 class="card-title fs-7 fs-md-5 mb-1">Walls</h6>
+                <p class="card-text fs-3 fs-md-1 mb-0" id="stat-walls">0</p>
             </div>
         </div>
     </div>
-    <div class="col-md-2">
-        <div class="card text-white bg-danger">
-            <div class="card-body">
-                <h5 class="card-title">Graves</h5>
-                <p class="card-text display-6" id="stat-graves">0</p>
+    <div class="col-6 col-sm-4 col-md-2">
+        <div class="card text-white bg-danger h-100">
+            <div class="card-body p-2 p-md-3">
+                <h6 class="card-title fs-7 fs-md-5 mb-1">Graves</h6>
+                <p class="card-text fs-3 fs-md-1 mb-0" id="stat-graves">0</p>
             </div>
         </div>
     </div>
-    <div class="col-md-2">
-        <div class="card text-white bg-info">
-            <div class="card-body">
-                <h5 class="card-title">Finds</h5>
-                <p class="card-text display-6" id="stat-finds">0</p>
+    <div class="col-6 col-sm-4 col-md-2">
+        <div class="card text-white bg-info h-100">
+            <div class="card-body p-2 p-md-3">
+                <h6 class="card-title fs-7 fs-md-5 mb-1">Finds</h6>
+                <p class="card-text fs-3 fs-md-1 mb-0" id="stat-finds">0</p>
             </div>
         </div>
     </div>
-    <div class="col-md-2">
-        <div class="card text-white bg-secondary">
-            <div class="card-body">
-                <h5 class="card-title">Media</h5>
-                <p class="card-text display-6" id="stat-media">0</p>
+    <div class="col-6 col-sm-4 col-md-2">
+        <div class="card text-white bg-secondary h-100">
+            <div class="card-body p-2 p-md-3">
+                <h6 class="card-title fs-7 fs-md-5 mb-1">Media</h6>
+                <p class="card-text fs-3 fs-md-1 mb-0" id="stat-media">0</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Main Data Tabs -->
-<ul class="nav nav-tabs" id="mainTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="mekan-tab" data-bs-toggle="tab" data-bs-target="#mekan" type="button">
-            <i class="bi bi-building"></i> MEKAN Units
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="birim-tab" data-bs-toggle="tab" data-bs-target="#birim" type="button">
-            <i class="bi bi-layers"></i> Birim
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="walls-tab" data-bs-toggle="tab" data-bs-target="#walls" type="button">
-            <i class="bi bi-bricks"></i> Walls
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="graves-tab" data-bs-toggle="tab" data-bs-target="#graves" type="button">
-            <i class="bi bi-person-x"></i> Graves
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="finds-tab" data-bs-toggle="tab" data-bs-target="#finds" type="button">
-            <i class="bi bi-gem"></i> Finds
-        </button>
-    </li>
-</ul>
+<!-- Main Data Tabs - Scrollable on mobile -->
+<div class="nav-wrapper" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+    <ul class="nav nav-tabs flex-nowrap" id="mainTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active text-nowrap" id="mekan-tab" data-bs-toggle="tab" data-bs-target="#mekan" type="button">
+                <i class="bi bi-building"></i> <span class="d-none d-sm-inline">MEKAN Units</span><span class="d-sm-none">MEKAN</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link text-nowrap" id="birim-tab" data-bs-toggle="tab" data-bs-target="#birim" type="button">
+                <i class="bi bi-layers"></i> <span class="d-none d-sm-inline">Birim</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link text-nowrap" id="walls-tab" data-bs-toggle="tab" data-bs-target="#walls" type="button">
+                <i class="bi bi-bricks"></i> <span class="d-none d-sm-inline">Walls</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link text-nowrap" id="graves-tab" data-bs-toggle="tab" data-bs-target="#graves" type="button">
+                <i class="bi bi-person-x"></i> <span class="d-none d-sm-inline">Graves</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link text-nowrap" id="finds-tab" data-bs-toggle="tab" data-bs-target="#finds" type="button">
+                <i class="bi bi-gem"></i> <span class="d-none d-sm-inline">Finds</span>
+            </button>
+        </li>
+    </ul>
+</div>
 
 <div class="tab-content mt-3" id="mainTabsContent">
     <!-- MEKAN Tab -->
@@ -110,11 +112,11 @@
                         <th>Media</th>
                         <th>MEKAN No</th>
                         <th>Year</th>
-                        <th>Area</th>
-                        <th>Opening</th>
-                        <th>Coordinates</th>
-                        <th>Description</th>
-                        <th>Relations</th>
+                        <th class="d-none d-md-table-cell">Area</th>
+                        <th class="d-none d-lg-table-cell">Opening</th>
+                        <th class="d-none d-xl-table-cell">Coordinates</th>
+                        <th class="d-none d-sm-table-cell">Description</th>
+                        <th class="d-none d-md-table-cell">Relations</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -128,13 +130,13 @@
 
     <!-- Birim Tab -->
     <div class="tab-pane fade" id="birim" role="tabpanel">
-        <div class="d-flex justify-content-between mb-3">
-            <div>
+        <div class="row mb-3 g-2">
+            <div class="col-12 col-md-6">
                 <input type="text" class="form-control" id="searchBirim" placeholder="Search Birim...">
             </div>
-            <div>
-                <button class="btn btn-success" onclick="exportToExcel('birim')">
-                    <i class="bi bi-file-earmark-excel"></i> Export Excel
+            <div class="col-12 col-md-6 text-md-end">
+                <button class="btn btn-success w-100 w-md-auto" onclick="exportToExcel('birim')">
+                    <i class="bi bi-file-earmark-excel"></i> <span class="d-none d-sm-inline">Export</span> Excel
                 </button>
             </div>
         </div>
@@ -333,6 +335,105 @@
 .clickable-row:hover {
     background-color: #f5f5f5;
 }
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    /* Smaller font sizes on mobile */
+    .h2 {
+        font-size: 1.5rem;
+    }
+    
+    /* Stack buttons vertically on mobile */
+    .btn-group-vertical-mobile {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group-vertical-mobile .btn {
+        width: 100%;
+        margin-bottom: 0.25rem;
+    }
+    
+    /* Make modals full screen on mobile */
+    .modal-dialog {
+        margin: 0;
+        max-width: 100%;
+        height: 100vh;
+    }
+    
+    .modal-content {
+        height: 100%;
+        border-radius: 0;
+    }
+    
+    .modal-body {
+        overflow-y: auto;
+        padding: 1rem;
+    }
+    
+    /* Responsive tables */
+    .table-responsive table {
+        font-size: 0.875rem;
+    }
+    
+    .table td, .table th {
+        padding: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    /* Hide less important columns on mobile */
+    .d-mobile-none {
+        display: none !important;
+    }
+    
+    /* Smaller pagination on mobile */
+    .pagination {
+        font-size: 0.875rem;
+    }
+    
+    .pagination .page-link {
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Tablet styles */
+@media (min-width: 768px) and (max-width: 992px) {
+    .modal-dialog {
+        max-width: 90%;
+    }
+}
+
+/* Touch-friendly buttons */
+@media (hover: none) and (pointer: coarse) {
+    .btn {
+        min-height: 44px;
+        padding: 0.5rem 1rem;
+    }
+    
+    .form-control, .form-select {
+        min-height: 44px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
+/* Scrollable tabs container */
+.nav-wrapper {
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.nav-wrapper::-webkit-scrollbar {
+    height: 4px;
+}
+
+.nav-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.nav-wrapper::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 2px;
+}
 </style>
 
 <script>
@@ -425,26 +526,28 @@ async function loadMekanData(page = 1) {
                     </td>
                     <td><strong>${item.mekan_no || ''}</strong></td>
                     <td>${item.mekan_year || ''}</td>
-                    <td>${item.mekan_alan || ''}</td>
-                    <td>${item.mekan_acma || ''}</td>
-                    <td>
+                    <td class="d-none d-md-table-cell">${item.mekan_alan || ''}</td>
+                    <td class="d-none d-lg-table-cell">${item.mekan_acma || ''}</td>
+                    <td class="d-none d-xl-table-cell">
                         ${item.koordinat_x ? `X: ${item.koordinat_x}<br>` : ''}
                         ${item.koordinat_y ? `Y: ${item.koordinat_y}<br>` : ''}
                         ${item.koordinat_z ? `Z: ${item.koordinat_z}` : ''}
                     </td>
-                    <td>${item.description || ''}</td>
-                    <td>
+                    <td class="d-none d-sm-table-cell">${item.description || ''}</td>
+                    <td class="d-none d-md-table-cell">
                         <button class="btn btn-sm btn-info" onclick="event.stopPropagation(); showDetail('mekan', '${item.mekan_no}')">
-                            <i class="bi bi-diagram-3"></i> View Relations
+                            <i class="bi bi-diagram-3"></i> <span class="d-none d-lg-inline">View Relations</span>
                         </button>
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); showDetail('mekan', '${item.mekan_no}')">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn btn-sm btn-success" onclick="event.stopPropagation(); exportPdf('mekan', '${item.mekan_no}')">
-                            <i class="bi bi-file-earmark-pdf"></i>
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); showDetail('mekan', '${item.mekan_no}')" title="View">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-success d-none d-sm-inline-block" onclick="event.stopPropagation(); exportPdf('mekan', '${item.mekan_no}')" title="Export PDF">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(row);
